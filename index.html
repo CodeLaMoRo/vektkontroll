@@ -172,6 +172,15 @@ details:not([open]) .lbl-close{display:none}
 .steps li .n{flex:none;width:23px;height:23px;border-radius:50%;background:var(--green);color:var(--paper);display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
 .faq summary{font-size:14px;font-weight:600}
 .faq .tools-body p{font-size:14px;line-height:1.6}
+/* veiinger gjennom dagen */
+.weighgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:540px){.weighgrid{grid-template-columns:repeat(2,1fr)}}
+.wcell{background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:10px 8px;text-align:center}
+.wcell .wi{font-size:18px}
+.wcell .wl{font-size:10px;color:var(--ink-soft);margin:2px 0 7px;font-weight:600}
+.wcell input{padding:8px 6px;text-align:center;font-size:15px}
+/* pausemodus */
+.pausecard .btn.paused{background:var(--clay)}
 </style>
 </head>
 <body>
@@ -207,8 +216,15 @@ details:not([open]) .lbl-close{display:none}
     <div class="plan-status" id="planStatus"></div>
     <div class="meals" id="meals"></div>
     <div id="planEaten"></div>
-    <div class="row" id="evRow" style="margin-top:14px;display:none">
-      <div class="field"><label for="evWeight">Vekt før siste måltid (kg) – justerer kvelds</label><input type="number" id="evWeight" inputmode="decimal" step="0.1" placeholder="valgfritt"></div>
+    <div id="weighRow" style="margin-top:14px;display:none">
+      <div class="label" style="margin-bottom:8px">Veiinger gjennom dagen <span style="text-transform:none;letter-spacing:0;font-weight:400">— ⤵ vei deg etter hvert måltid (valgfritt, hopp gjerne over)</span></div>
+      <div class="weighgrid">
+        <div class="wcell"><div class="wi">🥣</div><div class="wl">etter frokost</div><input type="number" id="wmFrokost" inputmode="decimal" step="0.1" placeholder="kg"></div>
+        <div class="wcell"><div class="wi">🥗</div><div class="wl">etter lunsj</div><input type="number" id="wmLunsj" inputmode="decimal" step="0.1" placeholder="kg"></div>
+        <div class="wcell"><div class="wi">🍽️</div><div class="wl">etter middag</div><input type="number" id="wmMiddag" inputmode="decimal" step="0.1" placeholder="kg"></div>
+        <div class="wcell"><div class="wi">🌙</div><div class="wl">etter kvelds</div><input type="number" id="wmKvelds" inputmode="decimal" step="0.1" placeholder="kg"></div>
+      </div>
+      <p class="hint" style="margin-top:8px">Veiing etter middag (= før kvelds) finjusterer kveldsrasjonen automatisk.</p>
     </div>
     <div class="plan-grid" id="planGrid"></div>
   </section>
@@ -296,6 +312,11 @@ details:not([open]) .lbl-close{display:none}
         <div class="field" style="flex:2;min-width:160px"><label for="foodSel">Matvare</label><select id="foodSel"></select></div>
         <div class="field" style="max-width:90px"><label for="foodQty">Antall</label><input type="number" id="foodQty" inputmode="decimal" step="0.5" min="0" value="1"></div>
       </div>
+      <div class="row" id="customRow" style="margin-top:10px;display:none">
+        <div class="field" style="flex:2;min-width:140px"><label for="cfName">Navn (fritekst)</label><input type="text" id="cfName" maxlength="40" placeholder="t.d. Proteinbar"></div>
+        <div class="field" style="max-width:120px"><label for="cfGram">Gram/porsjon</label><input type="number" id="cfGram" inputmode="decimal" step="1" min="0" placeholder="g"></div>
+      </div>
+      <label id="cfSaveWrap" style="display:none;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--ink-soft);cursor:pointer"><input type="checkbox" id="cfSave" style="width:auto;margin:0"> Lagre matvaren i valglisten til senere bruk</label>
       <div class="hint" id="foodPreview" style="margin-top:8px"></div>
       <div class="btn-row"><button class="btn" id="foodAddBtn">Legg til</button></div>
     </section>
@@ -306,15 +327,6 @@ details:not([open]) .lbl-close{display:none}
         <button class="iconbtn" id="mealClear" style="font-size:13px;color:var(--clay)">Tøm dagen</button>
       </div>
       <div id="mealList"></div>
-    </section>
-
-    <section class="card pad">
-      <div class="label" style="margin-bottom:10px">Egen matvare</div>
-      <div class="row">
-        <div class="field" style="flex:2;min-width:140px"><label for="cfName">Navn</label><input type="text" id="cfName" maxlength="40" placeholder="t.d. Proteinbar"></div>
-        <div class="field" style="max-width:110px"><label for="cfGram">Gram/porsjon</label><input type="number" id="cfGram" inputmode="decimal" step="1" min="0"></div>
-      </div>
-      <div class="btn-row"><button class="btn ghost" id="cfAddBtn">Legg til i matlisten</button></div>
     </section>
 
     <details class="tools">
@@ -365,6 +377,13 @@ details:not([open]) .lbl-close{display:none}
         </svg>
         <div class="illu-cap">🟢 kveldsmål (på mållinja) · ⚫ morgenvekt · ↑ gult = maten du kan spise den dagen</div>
       </div>
+    </section>
+
+    <section class="card pad pausecard">
+      <div class="msub">⏸ Pausemodus</div>
+      <p>Setter daglig vekttap til <b>0</b>. Mållinja blir flat på startvekten, så du kan spise opp til startvekten hver dag (større måltider) mens du holder vekten. Slå av igjen for å gjenoppta nedgangen mot målet.</p>
+      <p class="muted">Følg med på vekten i pausen – etter en nedgangsperiode er forbrenningen lav, så kroppen legger lettere på seg.</p>
+      <div class="btn-row"><button class="btn" id="pauseBtn">Aktiver pausemodus</button></div>
     </section>
 
     <section class="card pad">
@@ -454,7 +473,7 @@ const SEED_RAW=[
 const SEED=SEED_RAW.map(p=>({date:p[0],w:p[1],note:""}));
 
 /* ---- standardplan fra «Ny periode 2026» ---- */
-function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),periode:90,frokost:30,lunsj:10,middag:50,kvelds:10};}
+function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),periode:90,frokost:30,lunsj:10,middag:50,kvelds:10,pause:false};}
 
 let state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};
 let chartRange="all"; // all | 1y | 90 | 30 | 7
@@ -516,7 +535,7 @@ function editEntry(date){
 /* ---- planmatematikk (closed-loop) ---- */
 function addDays(iso,n){const t=new Date(iso+"T00:00:00");t.setDate(t.getDate()+n);return t.toISOString().slice(0,10);}
 function daysBetween(a,b){return Math.round((Date.parse(b+"T00:00:00")-Date.parse(a+"T00:00:00"))/864e5);}
-function tapPerDag(p){return p.periode>0?(p.startvekt-p.maalvekt)/p.periode:0;}
+function tapPerDag(p){return (p.pause||p.periode<=0)?0:(p.startvekt-p.maalvekt)/p.periode;}
 function planEnd(p){return addDays(p.startdato,p.periode-1);}
 function maallinje(p,iso){
   // dag 1 = startdato = første reduksjonsdag (dagens andel av reduksjonen er medregnet)
@@ -574,16 +593,17 @@ function renderPlan(){
 
   if(!ref){
     $("planStatus").innerHTML="Logg morgenvekten din for å se hvor mye du kan spise i dag.";
-    $("meals").innerHTML="";$("planGrid").innerHTML="";$("planEaten").innerHTML="";$("evRow").style.display="none";return;
+    $("meals").innerHTML="";$("planGrid").innerHTML="";$("planEaten").innerHTML="";$("weighRow").style.display="none";return;
   }
   const isToday=!!todayEntry;
   const morning=ref.w;
   const totalG=Math.round(Math.max(0,ml-morning)*1000);   // total mat i dag = (mållinje − morgenvekt) i gram
   const shares={frokost:p.frokost,lunsj:p.lunsj,middag:p.middag,kvelds:p.kvelds};
 
-  // Kvelds (siste måltid) justeres av vekt målt rett før: mållinje − kveldsvekt
-  const ev=(isToday&&ref.ev!=null)?ref.ev:null;
-  const kveldsCorrG=ev!=null?Math.round(Math.max(0,ml-ev)*1000):null;
+  // Kvelds (siste måltid) justeres av veiing etter middag (= før kvelds): mållinje − vekt
+  const wm=(isToday&&ref.wm)?ref.wm:{};
+  const beforeKvelds=wm.middag!=null?wm.middag:null;
+  const kveldsCorrG=beforeKvelds!=null?Math.round(Math.max(0,ml-beforeKvelds)*1000):null;
 
   $("meals").innerHTML=MEALS.map(m=>{
     let g,tag="";
@@ -602,13 +622,17 @@ function renderPlan(){
   }else pe+='<div class="hint" style="margin-top:0">Loggfør mat i Mat-fanen for å følge dagstotalen.</div>';
   $("planEaten").innerHTML=pe;
 
-  // kveldsvekt-felt (kun når dagens morgenvekt er logget)
-  $("evRow").style.display=isToday?"flex":"none";
-  if(isToday)$("evWeight").value=ref.ev!=null?ref.ev:"";
+  // veiinger-gjennom-dagen (kun når dagens morgenvekt er logget)
+  $("weighRow").style.display=isToday?"block":"none";
+  if(isToday){
+    $("wmFrokost").value=wm.frokost??"";$("wmLunsj").value=wm.lunsj??"";
+    $("wmMiddag").value=wm.middag??"";$("wmKvelds").value=wm.kvelds??"";
+  }
 
   // status
   let phase;
-  if(today<p.startdato)phase="Planen starter "+fmtDate(p.startdato);
+  if(p.pause)phase="⏸ Pausemodus · vekttap = 0";
+  else if(today<p.startdato)phase="Planen starter "+fmtDate(p.startdato);
   else if(today>end)phase="Etter perioden · konstant mål "+fmt(p.maalvekt,1)+" kg";
   else phase="Dag "+(daysBetween(p.startdato,today)+1)+" av "+p.periode;
   const warn=totalG===0?"<br><span style='font-weight:600;color:var(--clay)'>0 g: morgenvekten din ("+fmt(morning)+") er ikke under mållinja ("+fmt(ml)+"). Vei deg om morgenen – når du er lettere enn mållinja blir differansen matbudsjettet ditt.</span>":"";
@@ -669,7 +693,7 @@ function renderChart(){
   const goalLine='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--clay)" stroke-width="1.2" stroke-dasharray="2 4" opacity="0.6"/>'+
     '<text x="'+(W-padR)+'" y="'+(+gy-5)+'" text-anchor="end" font-size="10" fill="var(--clay)" font-family="JetBrains Mono,monospace">målvekt '+fmt(p.maalvekt)+'</text>';
   // mållinje (daglig målvekt) over planperioden
-  const ax=X(p.startdato),ay=Y(maallinje(p,p.startdato)),bx=X(end),by=Y(p.maalvekt);
+  const ax=X(p.startdato),ay=Y(maallinje(p,p.startdato)),bx=X(end),by=Y(maallinje(p,end));
   const tgtLine='<path d="M '+ax.toFixed(1)+' '+ay.toFixed(1)+' L '+bx.toFixed(1)+' '+by.toFixed(1)+'" fill="none" stroke="var(--green-soft)" stroke-width="2" stroke-dasharray="5 4"/>'+
     '<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="2.5" fill="var(--green-soft)"/>'+
     '<text x="'+bx.toFixed(1)+'" y="'+(by-6).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--green-soft)" font-family="JetBrains Mono,monospace">mållinje</text>';
@@ -707,7 +731,12 @@ function renderList(){
   const mb=$("moreBtn");if(mb)mb.onclick=()=>{listLimit+=50;renderList();};
 }
 
-function render(){renderStats();renderPlan();renderChart();renderList();}
+function render(){renderStats();renderPlan();renderChart();renderList();renderPauseBtn();}
+function renderPauseBtn(){
+  const b=$("pauseBtn");if(!b)return;const on=!!state.plan.pause;
+  b.textContent=on?"⏸ Pausemodus PÅ – trykk for å gjenoppta nedgangen":"Aktiver pausemodus";
+  b.classList.toggle("paused",on);
+}
 
 /* ---- Matvekt-fane ---- */
 const MATVARER=[
@@ -795,17 +824,30 @@ function foodBudgetG(){
 }
 function populateFoodSelect(){
   const sel=$("foodSel");if(!sel)return;
+  const prev=sel.value;
   const groups={};
   allFoods().forEach((f,i)=>{(groups[f.cat]=groups[f.cat]||[]).push(Object.assign({i},f));});
-  sel.innerHTML=Object.keys(groups).map(cat=>
+  sel.innerHTML='<option value="custom">✏️ Egen matvare (fritekst)…</option>'+Object.keys(groups).map(cat=>
     '<optgroup label="'+cat+'">'+groups[cat].map(f=>'<option value="'+f.i+'">'+f.name+' ('+fmtG(f.g)+' g)</option>').join("")+'</optgroup>'
   ).join("");
-  updatePreview();
+  if(prev&&[...sel.options].some(o=>o.value===prev))sel.value=prev;
+  toggleCustom();updatePreview();
+}
+function toggleCustom(){
+  const custom=$("foodSel").value==="custom";
+  $("customRow").style.display=custom?"flex":"none";
+  $("cfSaveWrap").style.display=custom?"flex":"none";
 }
 function updatePreview(){
   const sel=$("foodSel");if(!sel)return;
-  const f=allFoods()[+sel.value];const qty=parseFloat(($("foodQty").value||"").replace(",","."))||0;
-  $("foodPreview").innerHTML=f?("= <b>"+Math.round(f.g*qty)+" g</b>  ("+fmtG(f.g)+" g × "+fmtG(qty)+")"):"";
+  const qty=parseFloat(($("foodQty").value||"").replace(",","."))||0;
+  if(sel.value==="custom"){
+    const g=parseFloat(($("cfGram").value||"").replace(",","."))||0;
+    $("foodPreview").innerHTML=g?("= <b>"+Math.round(g*qty)+" g</b>  ("+fmtG(g)+" g × "+fmtG(qty)+")"):"";
+  }else{
+    const f=allFoods()[+sel.value];
+    $("foodPreview").innerHTML=f?("= <b>"+Math.round(f.g*qty)+" g</b>  ("+fmtG(f.g)+" g × "+fmtG(qty)+")"):"";
+  }
 }
 const MEALKEYS=[["frokost","🥣","Frokost"],["lunsj","🥗","Lunsj"],["middag","🍽️","Middag"],["kvelds","🌙","Kvelds"]];
 let currentMeal="frokost";
@@ -840,11 +882,24 @@ function renderKcalRef(){
   host.innerHTML='<div class="kref">'+KCAL100.map(k=>'<div>'+k.name+'</div><div class="kv">'+fmtG(k.g100)+' g</div>').join("")+'</div>';
 }
 function addFoodToMeal(){
-  const f=allFoods()[+$("foodSel").value];const qty=parseFloat(($("foodQty").value||"").replace(",","."));
-  if(!f||!qty||qty<=0){toast("Velg matvare og antall");return;}
+  const sel=$("foodSel").value;const qty=parseFloat(($("foodQty").value||"").replace(",","."));
+  if(!qty||qty<=0){toast("Sett et antall");return;}
+  let name,g,saved=false;
+  if(sel==="custom"){
+    name=$("cfName").value.trim();g=parseFloat(($("cfGram").value||"").replace(",","."));
+    if(!name||!g||g<=0){toast("Skriv navn og gram per porsjon");return;}
+    g=Math.round(g*10)/10;
+    if($("cfSave").checked){state.customFoods.push({name,g});saved=true;}
+    $("cfName").value="";$("cfGram").value="";$("cfSave").checked=false;
+  }else{
+    const f=allFoods()[+sel];if(!f){toast("Velg matvare");return;}
+    name=f.name;g=f.g;
+  }
   if(state.meal.date!==todayISO())state.meal={date:todayISO(),items:[]};
-  state.meal.items.push({name:f.name,g:f.g,qty:Math.round(qty*100)/100,meal:currentMeal});
-  save();renderDay();toast("Lagt til i "+currentMeal);
+  state.meal.items.push({name,g,qty:Math.round(qty*100)/100,meal:currentMeal});
+  save();
+  if(saved){populateFoodSelect();}
+  renderDay();toast(saved?"Lagt til og lagret i listen":"Lagt til i "+currentMeal);
 }
 
 /* ---- backup ---- */
@@ -879,12 +934,15 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   $("addBtn").onclick=addEntry;
   $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
-  $("evWeight").addEventListener("change",()=>{
-    const te=state.entries.find(x=>x.date===todayISO());
-    if(!te){toast("Logg morgenvekt først");$("evWeight").value="";return;}
-    const v=parseFloat(($("evWeight").value||"").replace(",","."));
-    if(isNaN(v))delete te.ev; else te.ev=Math.round(v*10)/10;
-    save();render();toast("Kvelds justert");
+  [["wmFrokost","frokost"],["wmLunsj","lunsj"],["wmMiddag","middag"],["wmKvelds","kvelds"]].forEach(([id,key])=>{
+    $(id).addEventListener("change",()=>{
+      const te=state.entries.find(x=>x.date===todayISO());
+      if(!te){toast("Logg morgenvekt først");$(id).value="";return;}
+      te.wm=te.wm||{};
+      const v=parseFloat(($(id).value||"").replace(",","."));
+      if(isNaN(v))delete te.wm[key]; else te.wm[key]=Math.round(v*10)/10;
+      save();render();toast("Veiing lagret");
+    });
   });
   $("saveSettings").onclick=()=>{
     const num=(id,def)=>{const v=parseFloat(($(id).value||"").replace(",","."));return isNaN(v)?def:v;};
@@ -929,23 +987,20 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("tabVekt").onclick=()=>showTab("vekt");
   $("tabMat").onclick=()=>showTab("mat");
   $("tabMetode").onclick=()=>showTab("metode");
+  $("pauseBtn").onclick=()=>{state.plan.pause=!state.plan.pause;save();render();toast(state.plan.pause?"Pausemodus aktivert (vekttap = 0)":"Pausemodus av – nedgang gjenopptatt");};
   // matvekt
   $("mealPick").addEventListener("click",ev=>{
     const b=ev.target.closest("button[data-meal]");if(!b)return;
     currentMeal=b.dataset.meal;
     [...$("mealPick").children].forEach(x=>x.classList.toggle("on",x===b));
   });
-  $("foodSel").addEventListener("change",updatePreview);
+  $("foodSel").addEventListener("change",()=>{toggleCustom();updatePreview();});
   $("foodQty").addEventListener("input",updatePreview);
+  $("cfName").addEventListener("input",updatePreview);
+  $("cfGram").addEventListener("input",updatePreview);
   $("foodAddBtn").onclick=addFoodToMeal;
   $("mealClear").onclick=()=>{if(state.meal.items&&state.meal.items.length&&confirm("Tømme hele dagens måltider?")){state.meal={date:todayISO(),items:[]};save();renderDay();}};
   $("mealList").addEventListener("click",ev=>{const i=ev.target.dataset.mdel;if(i!=null){state.meal.items.splice(+i,1);save();renderDay();}});
-  $("cfAddBtn").onclick=()=>{
-    const name=$("cfName").value.trim();const g=parseFloat(($("cfGram").value||"").replace(",","."));
-    if(!name||!g||g<=0){toast("Skriv navn og gram per porsjon");return;}
-    state.customFoods.push({name,g:Math.round(g*10)/10});save();$("cfName").value="";$("cfGram").value="";
-    populateFoodSelect();toast("Matvare lagt til");
-  };
 });
 
 let deferredPrompt=null;
