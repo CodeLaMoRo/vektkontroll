@@ -156,6 +156,9 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
     </div>
     <div class="plan-status" id="planStatus"></div>
     <div class="meals" id="meals"></div>
+    <div class="row" id="evRow" style="margin-top:14px;display:none">
+      <div class="field"><label for="evWeight">Vekt før siste måltid (kg) – justerer kvelds</label><input type="number" id="evWeight" inputmode="decimal" step="0.1" placeholder="valgfritt"></div>
+    </div>
     <div class="plan-grid" id="planGrid"></div>
   </section>
 
@@ -163,8 +166,8 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
     <div class="chart-head">
       <h2>Utvikling</h2>
       <div class="chart-toggle">
-        <button class="chip" id="rngAll">Alt</button>
-        <button class="chip on" id="rng1y">1 år</button>
+        <button class="chip on" id="rngAll">Alt</button>
+        <button class="chip" id="rng1y">1 år</button>
         <button class="chip" id="rng90">90 d</button>
         <button class="chip" id="rng30">30 d</button>
         <button class="chip" id="rng7">7 d</button>
@@ -208,7 +211,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
       </div>
       <div class="field" style="margin-top:10px;max-width:200px"><label for="height">Høyde (cm, for BMI)</label><input type="number" id="height" inputmode="numeric" step="1" placeholder="valgfritt"></div>
       <div class="btn-row"><button class="btn ghost" id="saveSettings">Lagre plan og innstillinger</button></div>
-      <p class="hint">Rasjonene er kg-ekvivalent: hvor mye du kan «spise inn» per måltid og fortsatt være på mållinjen. Summen av prosentene bør være 100.</p>
+      <p class="hint">Metoden: total mat i dag = dagens mållinje − morgenvekt, fordelt på måltidene etter prosentene (vist i gram). Siste måltid (kvelds) justeres av vekten du måler rett før det. Summen av prosentene bør være 100.</p>
 
       <div class="subhead">Dine data</div>
       <p class="hint">Denne appen inneholder ingen persondata. Første gang importerer du dine egne veiinger fra backup-fila under «Sikkerhetskopi» nedenfor. Alt lagres kun lokalt på enheten din.</p>
@@ -250,7 +253,7 @@ const SEED=SEED_RAW.map(p=>({date:p[0],w:p[1],note:""}));
 function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:"2026-01-05",periode:90,frokost:30,lunsj:10,middag:50,kvelds:10};}
 
 let state={entries:[],goal:null,height:null,plan:defaultPlan()};
-let chartRange="1y"; // all | 1y | 90
+let chartRange="all"; // all | 1y | 90 | 30 | 7
 
 /* ---- lagring ---- */
 function load(){
@@ -356,27 +359,40 @@ function renderPlan(){
   const today=todayISO(),end=planEnd(p);
   $("planTag").textContent=fmt(p.startvekt,1)+" → "+fmt(p.maalvekt,1)+" kg";
 
-  if(!e.length){
-    $("planStatus").innerHTML="Logg en vekt for å se dagens måltidsrasjoner.";
-    $("meals").innerHTML="";$("planGrid").innerHTML="";return;
-  }
   const todayEntry=e.find(x=>x.date===today);
-  const refW=todayEntry?todayEntry.w:e[e.length-1].w;
-  const r=rations(p,refW,today);
+  const ref=todayEntry||(e.length?e[e.length-1]:null);
+  const ml=maallinje(p,today);                 // dagens mållinje (kveldsmål)
 
-  // status-tekst
-  let phase,cls="";
+  if(!ref){
+    $("planStatus").innerHTML="Logg morgenvekten din for å se hvor mye du kan spise i dag.";
+    $("meals").innerHTML="";$("planGrid").innerHTML="";$("evRow").style.display="none";return;
+  }
+  const isToday=!!todayEntry;
+  const morning=ref.w;
+  const totalG=Math.round(Math.max(0,ml-morning)*1000);   // total mat i dag = (mållinje − morgenvekt) i gram
+  const shares={frokost:p.frokost,lunsj:p.lunsj,middag:p.middag,kvelds:p.kvelds};
+
+  // Kvelds (siste måltid) justeres av vekt målt rett før: mållinje − kveldsvekt
+  const ev=(isToday&&ref.ev!=null)?ref.ev:null;
+  const kveldsCorrG=ev!=null?Math.round(Math.max(0,ml-ev)*1000):null;
+
+  $("meals").innerHTML=MEALS.map(m=>{
+    let g,tag="";
+    if(m[0]==="kvelds"&&kveldsCorrG!=null){g=kveldsCorrG;tag=" <span class='u' style='color:var(--green-soft)'>justert</span>";}
+    else g=Math.round(totalG*(shares[m[0]]||0)/100);
+    return '<div class="meal"><div class="mi">'+m[1]+'</div><div class="mn">'+m[2]+tag+'</div><div class="mv">'+g+'<span class="u"> g</span></div></div>';
+  }).join("");
+
+  // kveldsvekt-felt (kun når dagens morgenvekt er logget)
+  $("evRow").style.display=isToday?"flex":"none";
+  if(isToday)$("evWeight").value=ref.ev!=null?ref.ev:"";
+
+  // status
+  let phase;
   if(today<p.startdato)phase="Planen starter "+fmtDate(p.startdato);
-  else if(today>end)phase="Perioden fullført "+fmtDate(end);
+  else if(today>end)phase="Etter perioden · konstant mål "+fmt(p.maalvekt,1)+" kg";
   else phase="Dag "+(daysBetween(p.startdato,today)+1)+" av "+p.periode;
-  const avvik=refW-r.ml;
-  const aTxt=Math.abs(avvik)<0.05?"på mållinjen":(avvik<0?fmt(-avvik)+" kg foran skjema":fmt(avvik)+" kg bak skjema");
-  cls=avvik<=0.05?"":"behind";
-  $("planStatus").innerHTML=phase+" · mållinje <b>"+fmt(r.ml)+" kg</b> · <b class='"+cls+"'>"+aTxt+"</b>"+(todayEntry?"":" <span style='opacity:.7'>(siste vekt)</span>");
-
-  $("meals").innerHTML=MEALS.map(m=>
-    '<div class="meal"><div class="mi">'+m[1]+'</div><div class="mn">'+m[2]+'</div><div class="mv">'+fmt(r[m[0]],2)+'<span class="u"> kg</span></div></div>'
-  ).join("");
+  $("planStatus").innerHTML=phase+" · mållinje <b>"+fmt(ml)+" kg</b> · morgenvekt <b>"+fmt(morning)+" kg</b>"+(isToday?"":" <span style='opacity:.7'>(siste vekt – ikke i dag)</span>");
 
   // prognose
   const inPlan=e.filter(x=>x.date>=p.startdato&&x.date<=end);
@@ -386,11 +402,11 @@ function renderPlan(){
     if(days>0){tapDag=(f.w-l.w)/days;proj=l.w-tapDag*Math.max(0,daysBetween(l.date,end));}
   }
   const daysLeft=Math.max(0,daysBetween(today,end));
-  const pct=Math.max(0,Math.min(1,(p.startvekt-refW)/(p.startvekt-p.maalvekt||1)));
+  const pct=Math.max(0,Math.min(1,(p.startvekt-morning)/(p.startvekt-p.maalvekt||1)));
   const mini=[
-    ["Tillatt totalt i dag",fmt(r.total,2)+" kg"],
+    ["Tillatt totalt i dag",totalG+" g"],
     ["% av mål nådd",Math.round(pct*100)+" %"],
-    ["Faktisk tap/dag",tapDag!=null?fmt(tapDag,3)+" kg":"–"],
+    ["Faktisk tap/dag",tapDag!=null?Math.round(tapDag*1000)+" g":"–"],
     ["Forventet sluttvekt",proj!=null?fmt(proj,1)+" kg":"–"],
     ["Dager igjen",daysLeft],
     ["Sluttdato",fmtDate(end)]
@@ -500,6 +516,13 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   $("addBtn").onclick=addEntry;
   $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
+  $("evWeight").addEventListener("change",()=>{
+    const te=state.entries.find(x=>x.date===todayISO());
+    if(!te){toast("Logg morgenvekt først");$("evWeight").value="";return;}
+    const v=parseFloat(($("evWeight").value||"").replace(",","."));
+    if(isNaN(v))delete te.ev; else te.ev=Math.round(v*10)/10;
+    save();render();toast("Kvelds justert");
+  });
   $("saveSettings").onclick=()=>{
     const num=(id,def)=>{const v=parseFloat(($(id).value||"").replace(",","."));return isNaN(v)?def:v;};
     const p=state.plan;
