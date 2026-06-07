@@ -216,16 +216,6 @@ details:not([open]) .lbl-close{display:none}
     <div class="plan-status" id="planStatus"></div>
     <div class="meals" id="meals"></div>
     <div id="planEaten"></div>
-    <div id="weighRow" style="margin-top:14px;display:none">
-      <div class="label" style="margin-bottom:8px">Veiinger gjennom dagen <span style="text-transform:none;letter-spacing:0;font-weight:400">— ⤵ vei deg etter hvert måltid (valgfritt, hopp gjerne over)</span></div>
-      <div class="weighgrid">
-        <div class="wcell"><div class="wi">🥣</div><div class="wl">etter frokost</div><input type="number" id="wmFrokost" inputmode="decimal" step="0.1" placeholder="kg"></div>
-        <div class="wcell"><div class="wi">🥗</div><div class="wl">etter lunsj</div><input type="number" id="wmLunsj" inputmode="decimal" step="0.1" placeholder="kg"></div>
-        <div class="wcell"><div class="wi">🍽️</div><div class="wl">etter middag</div><input type="number" id="wmMiddag" inputmode="decimal" step="0.1" placeholder="kg"></div>
-        <div class="wcell"><div class="wi">🌙</div><div class="wl">etter kvelds</div><input type="number" id="wmKvelds" inputmode="decimal" step="0.1" placeholder="kg"></div>
-      </div>
-      <p class="hint" style="margin-top:8px">Veiing etter middag (= før kvelds) finjusterer kveldsrasjonen automatisk.</p>
-    </div>
     <div class="plan-grid" id="planGrid"></div>
   </section>
 
@@ -248,9 +238,19 @@ details:not([open]) .lbl-close{display:none}
     <div class="label" style="margin-bottom:12px">Ny registrering</div>
     <div class="row">
       <div class="field" style="max-width:170px"><label for="d">Dato</label><input type="date" id="d"></div>
-      <div class="field"><label for="w">Vekt (kg)</label><input type="number" id="w" inputmode="decimal" step="0.1" min="20" max="400" placeholder="0,0"></div>
+      <div class="field"><label for="w">Morgenvekt (kg)</label><input type="number" id="w" inputmode="decimal" step="0.1" min="20" max="400" placeholder="0,0"></div>
     </div>
-    <div class="field" style="margin-top:10px"><label for="note">Notat (valgfritt)</label><input type="text" id="note" maxlength="80" placeholder="t.d. etter trening"></div>
+
+    <div class="label" style="margin:16px 0 8px">Veiinger gjennom dagen <span style="text-transform:none;letter-spacing:0;font-weight:400">— ⤵ vei deg etter hvert måltid (valgfritt, hopp gjerne over)</span></div>
+    <div class="weighgrid">
+      <div class="wcell"><div class="wi">🥣</div><div class="wl">etter frokost</div><input type="number" id="wmFrokost" inputmode="decimal" step="0.1" placeholder="kg"></div>
+      <div class="wcell"><div class="wi">🥗</div><div class="wl">etter lunsj</div><input type="number" id="wmLunsj" inputmode="decimal" step="0.1" placeholder="kg"></div>
+      <div class="wcell"><div class="wi">🍽️</div><div class="wl">etter middag</div><input type="number" id="wmMiddag" inputmode="decimal" step="0.1" placeholder="kg"></div>
+      <div class="wcell"><div class="wi">🌙</div><div class="wl">etter kvelds</div><input type="number" id="wmKvelds" inputmode="decimal" step="0.1" placeholder="kg"></div>
+    </div>
+    <p class="hint" style="margin-top:8px">Veiing etter middag (= før kvelds) finjusterer kveldsrasjonen automatisk.</p>
+
+    <div class="field" style="margin-top:12px"><label for="note">Notat (valgfritt)</label><input type="text" id="note" maxlength="80" placeholder="t.d. etter trening"></div>
     <div class="btn-row"><button class="btn" id="addBtn">Lagre registrering</button></div>
   </section>
 
@@ -509,25 +509,41 @@ function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show")
 function fmtDate(iso){const[y,m,d]=iso.split("-");return d+"."+m+"."+y.slice(2);}
 
 /* ---- registreringer ---- */
+const WMBOX={wmFrokost:"frokost",wmLunsj:"lunsj",wmMiddag:"middag",wmKvelds:"kvelds"};
+function readWmBoxes(){
+  const wm={};
+  Object.keys(WMBOX).forEach(id=>{const v=parseFloat(($(id).value||"").replace(",","."));if(!isNaN(v)&&v>0)wm[WMBOX[id]]=Math.round(v*10)/10;});
+  return Object.keys(wm).length?wm:null;
+}
+function fillWmBoxes(wm){wm=wm||{};Object.keys(WMBOX).forEach(id=>$(id).value=wm[WMBOX[id]]??"");}
+function loadEntryForm(date){
+  const e=state.entries.find(x=>x.date===date);
+  $("w").value=e?String(e.w).replace(".",","):"";
+  $("note").value=e?(e.note||""):"";
+  fillWmBoxes(e?e.wm:null);
+}
 function addEntry(){
   const date=$("d").value||todayISO();
   const w=parseFloat(($("w").value||"").replace(",","."));
-  if(!w||w<20||w>400){toast("Skriv inn en gyldig vekt");return;}
+  if(!w||w<20||w>400){toast("Skriv inn en gyldig morgenvekt");return;}
   const note=$("note").value.trim();
   const i=state.entries.findIndex(e=>e.date===date);
   const obj={date,w:Math.round(w*10)/10,note};
+  const wm=readWmBoxes();if(wm)obj.wm=wm;
   if(i>=0)state.entries[i]=obj;else state.entries.push(obj);
   state.entries.sort((a,b)=>a.date.localeCompare(b.date));
-  save();$("w").value="";$("note").value="";render();
+  save();render();
   toast(i>=0?"Registrering oppdatert":"Registrering lagret");
 }
 function delEntry(date){
   if(!confirm("Slette registreringen for "+fmtDate(date)+"?"))return;
-  state.entries=state.entries.filter(e=>e.date!==date);save();render();toast("Slettet");
+  state.entries=state.entries.filter(e=>e.date!==date);save();
+  if($("d").value===date)loadEntryForm(date);
+  render();toast("Slettet");
 }
 function editEntry(date){
   const e=state.entries.find(x=>x.date===date);if(!e)return;
-  $("d").value=e.date;$("w").value=String(e.w).replace(".",",");$("note").value=e.note||"";
+  $("d").value=e.date;loadEntryForm(e.date);
   window.scrollTo({top:0,behavior:"smooth"});
   toast("Endre verdiene og lagre på nytt");
 }
@@ -593,7 +609,7 @@ function renderPlan(){
 
   if(!ref){
     $("planStatus").innerHTML="Logg morgenvekten din for å se hvor mye du kan spise i dag.";
-    $("meals").innerHTML="";$("planGrid").innerHTML="";$("planEaten").innerHTML="";$("weighRow").style.display="none";return;
+    $("meals").innerHTML="";$("planGrid").innerHTML="";$("planEaten").innerHTML="";return;
   }
   const isToday=!!todayEntry;
   const morning=ref.w;
@@ -621,13 +637,6 @@ function renderPlan(){
     pe+='<div class="hint" style="margin-top:0">'+(eover?'<b style="color:var(--clay)">'+(eaten-totalG)+' g over</b> budsjettet ('+totalG+' g)':'<b>'+(totalG-eaten)+' g igjen</b> av '+totalG+' g budsjett')+'</div>';
   }else pe+='<div class="hint" style="margin-top:0">Loggfør mat i Mat-fanen for å følge dagstotalen.</div>';
   $("planEaten").innerHTML=pe;
-
-  // veiinger-gjennom-dagen (kun når dagens morgenvekt er logget)
-  $("weighRow").style.display=isToday?"block":"none";
-  if(isToday){
-    $("wmFrokost").value=wm.frokost??"";$("wmLunsj").value=wm.lunsj??"";
-    $("wmMiddag").value=wm.middag??"";$("wmKvelds").value=wm.kvelds??"";
-  }
 
   // status
   let phase;
@@ -915,7 +924,7 @@ function importData(file){
     if(!Array.isArray(data.entries))throw 0;
     if(!confirm("Importere "+data.entries.length+" registreringer? Dette erstatter dagens data."))return;
     state={entries:data.entries,goal:data.goal??null,height:data.height??null,plan:Object.assign(defaultPlan(),data.plan||{}),meal:data.meal||{date:"",items:[]},customFoods:data.customFoods||state.customFoods||[]};
-    state.entries.sort((a,b)=>a.date.localeCompare(b.date));save();fillSettings();render();populateFoodSelect();renderDay();toast("Data importert");
+    state.entries.sort((a,b)=>a.date.localeCompare(b.date));save();fillSettings();$("d").value=todayISO();loadEntryForm(todayISO());render();populateFoodSelect();renderDay();toast("Data importert");
   }catch(e){toast("Filen kunne ikke leses");}};
   r.readAsText(file);
 }
@@ -929,21 +938,12 @@ function fillSettings(){
 
 document.addEventListener("DOMContentLoaded",()=>{
   load();maybeSeed();
-  $("d").value=todayISO();fillSettings();render();
+  $("d").value=todayISO();loadEntryForm(todayISO());fillSettings();render();
   populateFoodSelect();renderKcalRef();renderDay();
 
   $("addBtn").onclick=addEntry;
   $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
-  [["wmFrokost","frokost"],["wmLunsj","lunsj"],["wmMiddag","middag"],["wmKvelds","kvelds"]].forEach(([id,key])=>{
-    $(id).addEventListener("change",()=>{
-      const te=state.entries.find(x=>x.date===todayISO());
-      if(!te){toast("Logg morgenvekt først");$(id).value="";return;}
-      te.wm=te.wm||{};
-      const v=parseFloat(($(id).value||"").replace(",","."));
-      if(isNaN(v))delete te.wm[key]; else te.wm[key]=Math.round(v*10)/10;
-      save();render();toast("Veiing lagret");
-    });
-  });
+  $("d").addEventListener("change",()=>loadEntryForm($("d").value));
   $("saveSettings").onclick=()=>{
     const num=(id,def)=>{const v=parseFloat(($(id).value||"").replace(",","."));return isNaN(v)?def:v;};
     const p=state.plan;
@@ -959,7 +959,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("importBtn").onclick=()=>$("importFile").click();
   $("importFile").onchange=ev=>{if(ev.target.files[0])importData(ev.target.files[0]);ev.target.value="";};
   $("wipeBtn").onclick=()=>{if(confirm("Slette ALLE data permanent? Eksporter en kopi først hvis du er usikker."))
-    {localStorage.removeItem(KEY);state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};fillSettings();render();populateFoodSelect();renderDay();toast("Alle data slettet");}};
+    {localStorage.removeItem(KEY);state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};fillSettings();loadEntryForm($("d").value);render();populateFoodSelect();renderDay();toast("Alle data slettet");}};
   $("list").addEventListener("click",ev=>{
     const ed=ev.target.dataset.edit,dl=ev.target.dataset.del;
     if(ed)editEntry(ed);if(dl)delEntry(dl);
