@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3d2f">
+<title>Vektkontroll</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22Vektkontroll%22%2C%20%22short_name%22%3A%20%22Vekt%22%2C%20%22description%22%3A%20%22Privat%20vektlogg%20med%20closed-loop%20plan%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22scope%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22orientation%22%3A%20%22portrait%22%2C%20%22background_color%22%3A%20%22%23f4eee1%22%2C%20%22theme_color%22%3A%20%22%231f3d2f%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAHuUlEQVR4nO3d2XITVxAG4DMu3QVThVlykQRygyTbJCF7gCzkKdiCDTxYMDhsTxESCJCdJNhY5mVyMZRKns0z6pnuv8/8X6moQjhMnz7/9GhiISdvHHo3EM1rwboA8o0BIhEGiEQYIBJhgEiEASKRQQiJdQ3kGCcQiTBAJMIAkciAL4FIghOIRHgXRiKcQCTCAJEIA0QiDBCJMEAkwrswEhkwPiTBSxiJ8FsZJMIJRCIMEInwLoxEOIFIhAEiEQaIRBggEmGASIR3YSTC/xNNIryEkcjAugAUpx781%2BjrX1x4r6NKfEkOHDlpXYONpomp1ts89StA7YamTK/C1IsA6eQmrw9JSg4cGVrX0JVTD/61LuG1Fxfety6hK8lijAFahYnOrK0YYxRVgIS5qb/BagfCF0%2BAmm5qu7toe3RDMQSo/ubpbBtaPZ1KFo86DtDq/VpbtXXRZp/Ay2tFsnh0ZF3DnFbv/7Pv12xd/EChkmpe6pyPywB53BKPNdfhL0D77gTyNrguvpCzAFVvgJfux7GKlJsAxdT0VBwr8vF%2BoDh6nVFddp3XTAiSxaNj6xr2sXr/edkfbV08rVdHZ1wvEH0CuW5uTRULqVg%2BCOgA9SE9Kb8Zwr2ElTUusuhkuFt1sngMMUCr954XPr916bRqHRZ8rR3xEuarg60rW2ZZW2wli8eWrWvYY/Xe34XPb136ULkSW176gDiB8tC6psDLkpODSBNopei023bSyi7gNwRoAuE3S1/h8gsbZQUlQFBNwYfTLpQAFer5%2BEmBNyE5eGzFuoawcu%2Bv/JPblz7SrwQWbIvsJxBsa6AUNqSwdcpQPx8IsypA1o1KDr5peQlbuVs0fi7bj5/CwoJ1bYDtsr%2BEZSCkBxZgcywDVHaWUyO2bTQLEOA0dqGwRYYZQvuUVqhiCsFWaFMY0Gug7csfW5fgA1SjbAK0cvdPk%2BNGzKqlKBMI6qzCh9MugwBx/HTEpLEQEwjnfHIEpGmDkADcViDUUBN4qerlaU%2BglTt/ZJ7ZvvKJcg3RyLcu396uDcxPKPMCGsGvVrlCiNdA5JdqgJZzA/Ylr18y%2BQbmm9wpTiASMf9eGP6LigwXBesVyQlEInoBWr7ze%2BaZl1c%2BVTt6xPJtzLe6O5xAJMIAkYjpv8pw8Xo0w0vNWnXa3oV52Y1ZXmpWqlPpErb8w286B6KUWsPNXgO9/O4zq0PHx7CZfBFNIgwQiTBAJGJ4F%2BbldibDUdkapXICkQgDRCIDqzeJg785vYyjsnVK5QQiEQaIRBggElkIIVF55Okct/gx3vy1ecH2ZQN2uI8TaLz5bPpri39hP/UuQLOb3crGtx5HX8wCZNLx/EGFZbQeR3kZypQCtHP1C50DVVDo8njzGcgoUmt4Xy5hFfs695aX/YcgGdKhdhdmdpuQPnaunqnownjzWY1q99RckZKdq2c0l2bb24UerPH1Y2etOkNP96l2pubx5tPS9KydUV6XbW/7cglL7ZOh26WxmOPLekIvQPnNA9wJYUnVAe1IvmbNMvo1gYK4uRUJM0mPud4FKLR0IWv0d0ZM8y7M9MXe3sfO2tmKpjTN0M7aWauFmHdVdQLlt218%2B4lmAbOqM%2BRFvoHK6%2BrjJWyqlV7HEcS59TpAcj1PTwghOfSW9o/oGuWm7sR0G/L11GRbdsDoJCeQfQ5cWwhJov3IGd1%2BYlDGzGOyfq5p4ybr52xrLh6c6mUYTKA5dktBo6oiWEJbUC5ho1u/WJdQdwMQ0oPQrpRNgBD2YD6wlVsVhjKBAsZZBZuPWQiNmgIKEIjZDE3Wz2V%2Ba1ERtOTQ22Y/7mR063H%2Bycn6l/qV5I1uPZ6tJPNbQ2hNs5xAIFtSKFObo1KVwV3CCs8wSgE2xzhAhWcPYJsQoF28UqafVF8BsypA1o2yv4RNrhUNoQ0OoT0KG1LYOmX2AQrM0H5g0xPU39La6H2ZaePMCzN%2BlJ9I9rUFnI93mVz7yroET3DahRKgUNKU0cYj/UpwFC4fJz0BKkCBGdoLPz0hhAX7q%2BjeR6HRxiPzwpQfZaeNeWGZB9YECiHslpxhwz7NobLFljXHULL0DuLP7Rpu/Fz4/O61r5Ur0edr7XATKFXWrLLmRsNXekIIydJxxAmUGt4sjcvuddCGzs3pYkEnUKqicRXt9shpegJ4gEI/MuQ3PQH8EjZVnRX8LpeJYF3J0vHPrWuoZXjzp4o/3b3%2BjVolbYljRW4ClIqj6XGsIuUsQGG/7gfsDXBdfCF/AQo1tiHg7YTHmutwGaCUly3xUud8HAco1NubYLc94OW1Ilk6bv9jUISGNx/W/Mrd6%2Be7K2MKrZ5OJUsn3AcoNfz%2BYaOv371xPpqjG4onQKH5LmbU31S1A%2BGLKkBTwg3uSEy5mYozQCmcGEUZnVRyON4ATZ00StKreHMzlRw%2B0aMf8nDy%2Bx8VjvLqxrcKRwHRrwDNajdMvQrNrP4GKKNpnnqbmAwGiETQ35FI4FA/H4ic4AQikUHgCCIBTiASYYBIhAEiEQaIRBggEuFdGIlwApEIA0Qi/FYGiXACkciAA4gkeBdGIryEkQgDRCIMEIkwQCTCAJEI78JIhBOIRPitDBLhBCIRBohEGCAS4V0YiXACkQgDRCIMEIkwQCTCAJHI/%2BvaGbbHUNOjAAAAAElFTkSuQmCC%22%2C%20%22sizes%22%3A%20%22192x192%22%2C%20%22type%22%3A%20%22image/png%22%2C%20%22purpose%22%3A%20%22any%20maskable%22%7D%2C%20%7B%22src%22%3A%20%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAASxElEQVR4nO3d27KcR3UH8BnX3AWlygJzk8LkxjqShDiGYFlJyFNgC9C2eTB8wgeeIkACcYWEkATJ2uJlcqGUrUh7Zs98Xx9W9/r9al9QhTTu6e61/t3fSJrtn7z45xsA8nmh9wAA6EMAACQlAACSEgAASQkAgKQEAEBSAgAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkBABAUgIAICkBAJDUbrPZ9h4DAB24AQAkJQAAkhIAAEkJAICkBABAUgIAICkBAJCUAABISgAAJCUAAJISAABJ7fxTQAA5uQEAJCUAAJISAABJCQCApHwhDEBSbgAASQkAgKQEAEBSAgAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkBABAUgIAICkBAJCUAABISgAAJOX7AACScgMASGrn/A%2BQkxsAQFICACApAQCQlAAASGrnT4EC5OQGAJCUAABISgAAJCUAAJISAABJCQCApAQAQFICACApAQCQlC%2BEAUjKDQAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkBABAUgIAICkBAJCUAABISgAAJCUAAJISAABJCQCApHwfAEBSbgAASQkAgKR2ngAB5OQGAJCUAABISgAAJCUAAJISAABJ7XoPAKr41s//p%2BCr/eEHf1Hw1SCI7Ve%2B9krvMcBCZbv8MrKBcQkAhhGh3R9DJDAKAUBQo7T7Y4gEYhIABDJT099HGBCHAKCzDE1/H2FAXwKADjI3/X2EAe0JANrR948hCWhm%2B5WvXes9Bib3rZ//d%2B8hDOkPP/jL3kNgcgKAWvT9UiQBlQgACtP365EElLW9IgAo5LbW38QDMUAhAoC19P1eJAErCQCW0/ojEAMsJgBYQuuPRgywgADgNFp/ZGKAkwgAjqLvj0UScAwBwCW0/nGJAQ4TAOw1eusv1f7MA7MSAFxslK7Xt7uZJYYmAHhW5KYWv5GZPQYiAPhSwOY1es8ypUS2vfKSAGBz%2B9NAferBm3N2KJNMNAKAEI0pWz8y50SwvfLS9d5joJvbn/5X3wE8ePOv%2Bg6gO0tARwIgqb59R9N5nhWhPQGQUa9eo8scw%2BrQjADIpUtz0VmWsVjUJgASad9QdJP1rBr1CIAUGjcRHaQGi0hxAmB%2BLRuHrlGb1aQgATC5Zv1Cs2jJslKEAJhWmx6hQfRllVlDAMypQV/QFOKw3CwjACZUux3oBTFZd04lAKbiJJicDcBJBMA8HAB5wk7gSAJgElVrXsGPyJbgUgJgBvVKXZ2Pzt7gAAEwNqc8LmWTsI8AGJjDHcezW3je9spLN3qPgSVuf/r7Gi/74M1v13hZgrBteNoLvQfAEsqYZSotcaUNSW1uAOOpUWxafzZ2ERs3gOGoW4qosejuAcMRACPR/SlIBuAR0DCKl5bWzxO2VlpuAGNQotRTfDO4B4xCAAxA96c2GZCTR0DRlS0krZ/D7LdU3ABCU400VnaTuAcEt73ydTeAoG5/8vuCr/bgrW8XfDXmZu8l4QYQlAqko7IbpuxmpiA3gIgKFozWzxq24tzcAMJRcsRRcAu5BwQkAGLR/YlGBkxMAASi%2BxOTDJjV9srXb/YeA5vNZnP7k/8s9VIP3vrrUi8FX7BF5%2BMGMBulRSW21nwEQAilzlZKlKpKbbCClwnWEAD96f4MRAbMRAB0pvszHBkwje2f%2BhC4n1uFCuCh7k9zdu8E3ACGp37owsabgADopsgBShHSUZHtV%2BomwQICoA/dnznIgKEJgA50f2YiA8YlAIak%2BxOKDTkoAdDa%2BpOOYiOg9dvSJaA9AdCULQ4HKJDGBEA7Hv0zNx8GDEcAjET3JzhbdCwCoBGP/knChwEDEQAt6P6kIgNGsdtstr3HwDEsE9nY89W5AVR365PfrXyFh2%2B9WmQk0Mz6Tbu%2BcLiUAKhL9yctGRCfAAhN92doNnBwAqAi5xdYSRFVtfNBS1gP771qdRjdw3uv3vp4XRNXBdW4AdSyctM/vOfuzCRWbua1%2BcF%2BAqAK3R%2BeJgNi2vUeAFRUpHHIY2blBlCe4z88zyUgIAEQi%2B7PxGzvaARAYc4pUIniKk4ABOJ8xPRs8lAEQElOKFCVEitLABTjs184hk%2BD4xAAIej%2BpGLDB%2BH7AMq49fF/rHsBqxCZ1Ynl1se/e3jvb3qPYgZuAP3ZyiRk20cgAApYffwHTqPoihAAnTkHkZbN350AAEhKAKy15irqBERya0rAU6D1BEA3uj9sFEJXAmAVZxDoSAGuJAD6cOqBLyiHXgTAck4f0J0yXEMAdOC8A89QFF0IgIWcOyAIxbiYAABISgC05qoLF1Ia7QmAJVw5IRQluYwAaMoZBw5QII0JgJM5a0BACnMBXwjTzsN7r5ntMVm1dh7ee%2B3Wx/%2B%2B9HdbqdPszFg7pnpQFm4UVupEHgGd5tZHi88mQF3K81QCoJGHP3yt9xBgDIqlGQEAkJQAOMHiC6YTDZxkccl4CnSSnU9NGjDJQ7N8Y7Fex3MDAEhKABzr5tKr5eee/8DpFhfO4lJNSAAAJCUAAJISAEfx/Afa8xSoNgEAkJQAAEhKAFTk%2BQ%2BspIiqEgCX8zwRhqNsj%2BH7AKoyt3OwjoOycJdwA6jl8x9%2Bp/cQYAZKqR4BAJCUALjEzY9%2B23sIwBKK91ICACApAVCFp5ZQkIKqRAAAJCUADvEMEYamhA8TAABJCYDyPK%2BE4pRVDQIAICkBAJCUAABIauefS9rn5s%2BW/vkBUzoZCzqymx/99vMf%2BfzgYm4AhdlqUIniKk4AACQlAACS8oUwxZnP%2BVjT0VnBi7kBACQlAC5282f/1nsIQBnKeR8BUNLnP/pu7yHAzJRYWQIAICkBAJCUAABISgAAJCUAAJISAABJCQCApATABfy1EZiMor6QACjGX1GBBhRaQQIAICkBAJCUAABIyvcBFGQmZ2Vl52Adn%2BUGAJCUAABISgAAJCUAAJISAABJCQCApAQAQFK7rT8aW4iZnJWVnYN1fJ4bAEBSAgAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkfCFMQWZyVlZ2DtbxWW4AAEkJAICkBEAxNz78rPcQYH4KrSABcIFHP/5e7yHwf4au9qEHPxlFfSEBQFxPGuigbXTowZOEACCiGx9%2B9nTrHK6NPjP44cZPEgKAcKZsl1O%2BKUYnAIhlX6McqIFO8BZIQgAQyOEWOUQDneAtkIcAIIQjH5QHb6BHvoXg74I8BAD9ndQQ5%2Biec7wLRicASlLVC0wzaae%2BkWneeEsmrSwBcDF/baSBxQ9DAnaBxW8k4HuZj3LeRwDQx8rGF6pvzvReSEUA0EGRlhekb870XsjG9wEUZz4vcePDfy33Up89%2BvHrpV5tvxZr2uq95KQqL7brPQASKdj6gyj7jp68mhigGY%2BACpuvx5VSaWY6Tvh87yg4M1OcANjLQaysevPZpS/U%2B4/aeGWZzwN2Ho6VZ0r3eHT/9Rsf1Do1P7pfrc6fW9BK72Kz2Ty6/7r9U5j53M8NgEnUa8owKwFAUxXP6a3UPf5DQwKgPEfRw%2Bq1uQYzr/v3oqxqEAB0MGgG6P5MRgAcoizrGTQDGIsSPkwAMKEaGeD4z3wEQBUOoccYqPHp/n0pqEoEAD0N8SBI92dWAuASSrS2ITKgBlurNjN8KQFAfwoVuhAAtQQ/ftKXzDueUqpHABBCqoaY6s0SmS%2BEudyj%2B3dufPCbRb/V3J5gxTyP5NH9OzZGA%2Bb5GG4AFWVoZ2U9un%2Bn9xDqmv4NFqeIqhIAxKJFQjMCABqRbUQjAI6yuHRdYBeYslFO%2BaZqW1w%2BZvtIAoCIJivgyd4O0xAABKVpQm0C4FieArU3RwbM8S7a8/ynAQEAFWlGRCYACG3oBjr04Mlg%2B%2BKfvdp7DCO5vvRaeq4XrLB42juy4msotDbcABiAqoYaBEAjI55hQxkrA8YabTSKpRkBcBqF3dEokz/KOOdj5k8lAKAkPYiB7PyDqc1c/%2BA352e6wyrnZ3euvx/3%2BcD52R0FtdKq9TX5J/J9ACc7P3vj%2Bvu/Xvq7zfZa6%2Ba/NuvbzfnZG%2Bb/VB4BNRW4c43k/OyN3kO4QMxRjUWBNCYAllDq3UVbgmjjycb8LyMAWnPGmY/uU4TSaE8AMCptF1YSAAvpPhFEWIUIY0jOEiwmADpw1S2ob/FrPaUoii4EwHKKP4heC2EDRGAV1hAAfTjvjE7fKUg59CIAVtEFgrAQOVn3lQRAN049ZbXsBfpOQQqhIwGw1ppeYOuX1aYv6/4FrSkBC7GeAGAqtZuCpsNMBEBnLgED0f3Lsvm7EwAF6AuhnLQc1m5QFq4IAdCfc1Bxx3SH87M3nvyyL/7H%2BtfkeLZ9BAKgDN0hmsMr8vz/e%2BqvpyPLUcoLm83WT6Gf5a6//%2Bveg5/w5/zs7oWzfX52t8iv97P4Z/Xxv/9bmOPHDaCYfe3jSNff/5dSI%2BGAw8u0chE5xsqtbo0KEgAl2ZrRPL0i52d3j1mgZ36ZNQ3FcpQlAAJxCajhScs4tXEs%2B11cyiYPRQAUpmUEtGxRLGU0VqQ4ARCL8xETs72jEQDl%2BTQYnuez34AEAEBSAqAKlwB4muN/TAKgFhkAT%2Bj%2BYQmAuGQAE7CNI9tttr2HMK/zt%2B9ef2/d7rc65Hb%2B9l1VUI8bQGhr8wO6soGDEwB1nb%2B99vGlEmJQ67fu%2BvLhMAFQnQwgId1/CAIAIKnti9/4Tu8xpHD9vX9e%2BQrnb/9dkZFAbXb7KNwAGlm/odcXFTSg%2Bw9EAIxEBhCcLToWAdBOkXONAiOsIpvT8b8lAdCUzQ0HKJDGBEBrPgxgSh79j0gADEkGEIoNOSgB0IEPA5iJR//jEgB9yADmoPsPTQB0IwMYne4/OgEwPBlAFzbeBARAT6XOPkqRxkptOcf/vrZX/VtAvV0rVEuP1RJN2LHTcAPor1QZlCpLOED3n4kACEEGMATdfzICYDYygEpsrfkIgCgKnokUKsUV3FSO/3Fsr37ju73HwJeuvferUi/1%2BO2/L/VSJGdbzsoNIJaC5VGwaMlM95%2BYAAhHBhCH7j83j4CCKtu71R6nsgMzcAMIqmzBuApwEt0/CQEQlwygC90/j%2B3Vlz0CCu3au0Wr8R3VyCH2WyoCYABla3KjLLmIbZaQR0ADKF5IxUud0en%2BOQmAMcgA6tH90/IIaCQ1urZazcyOSs4NYCQ1SstVIC3dHwEwGBlAEbo/G4%2BABlWpZSvgDGwevuAGMKRKxeYqMD3dn6e5AQysXr9Wz/OxW3je9urLf9t7DCx37d1f1nvxx%2B/8Q70XpxmbhH0EwAzqVbjyHp29wQECYBJOeTzDluBSAmAeVQt%2Bo%2BbHYSdwJAEwldqVv1H8sdkAnEQATMgBMCfrzqkEwJycBFOx3CwjAKbVoCls9IXerDJrCIDJtWkQGz2iLctKEQJgfs2axUa/qM9qUpAASKFl19hoHHVYRIoTAIk07iAbTaQEq0Y9AiCX9t1ko6EsZbGoTQBk1KWzbDSX41gdmhEASfXqMk/oNc%2BzIrQnAFLr23Q2%2Bo4loCsBQP8etMnXhsw5EWyvvvy93mOgv2vv/qL3EL70%2BJ3v9x5CFSaZaAQAXwrVoZ4YvU%2BZUiLbXv2mAOD/ufbTX/Qewl6Pf/L93kO4hNljIAKAi0VuZE/r29TMEkMTAOw1Snfbp1TXMw/MSgBwidHbX2ZaP4cJAI4iBsai9XMMAcBpJEFk%2Bj4nEQAsIQai0fpZQACwnBiIQOtnMQHAWmKgF62flQQAxUiCNvR9ShEAFCYG6tH6KWv7VQFAHa9IgkL%2BqO9ThwCgOkmwjL5PbQKAdiTBMfR9mtl%2B9Zuv9x4D6bzy03/qPYRw/viTf%2Bw9BNIRAHSWOQw0ffoSAASSIQw0feIQAAQ1Uxho%2BsQkABjGKJGg3TMKAcDAIkSCds%2B4BABzKpsNujxTEgAASb3QewAA9CEAAJISAABJCQCApAQAQFICACCp3WbbewgA9OAGAJCUAABIarfxDAggJTcAgKQEAEBSAgAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkBABAUgIAICkBAJCUAABISgAAJCUAAJLyfQAASbkBACQlAACSEgAASQkAgKQEAEBSAgAgKQEAkJQAAEhKAAAktfMXgQFycgMASEoAACQlAACSEgAASe18BgyQkxsAQFK%2BEAYgKTcAgKQEAEBSAgAgKQEAkJQAAEhKAAAkJQAAkhIAAEkJAICkBABAUgIAICkBAJCUAABISgAAJCUAAJLyfQAASbkBACQlAACSEgAASQkAgKR2PgMGyMkNACApAQCQlAAASEoAACQlAACSEgAASQkAgKQEAEBSAgAgKQEAkJQAAEjKF8IAJOUGAJCUAABISgAAJCUAAJISAABJCQCApAQAQFICACApAQCQlAAASEoAACQlAACSEgAASQkAgKQEAEBS/wupR41F3G8ebAAAAABJRU5ErkJggg%3D%3D%22%2C%20%22sizes%22%3A%20%22512x512%22%2C%20%22type%22%3A%20%22image/png%22%2C%20%22purpose%22%3A%20%22any%20maskable%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAHuUlEQVR4nO3d2XITVxAG4DMu3QVThVlykQRygyTbJCF7gCzkKdiCDTxYMDhsTxESCJCdJNhY5mVyMZRKns0z6pnuv8/8X6moQjhMnz7/9GhiISdvHHo3EM1rwboA8o0BIhEGiEQYIBJhgEiEASKRQQiJdQ3kGCcQiTBAJMIAkciAL4FIghOIRHgXRiKcQCTCAJEIA0QiDBCJMEAkwrswEhkwPiTBSxiJ8FsZJMIJRCIMEInwLoxEOIFIhAEiEQaIRBggEmGASIR3YSTC/xNNIryEkcjAugAUpx781+jrX1x4r6NKfEkOHDlpXYONpomp1ts89StA7YamTK/C1IsA6eQmrw9JSg4cGVrX0JVTD/61LuG1Fxfety6hK8lijAFahYnOrK0YYxRVgIS5qb/BagfCF0+Amm5qu7toe3RDMQSo/ubpbBtaPZ1KFo86DtDq/VpbtXXRZp/Ay2tFsnh0ZF3DnFbv/7Pv12xd/EChkmpe6pyPywB53BKPNdfhL0D77gTyNrguvpCzAFVvgJfux7GKlJsAxdT0VBwr8vF+oDh6nVFddp3XTAiSxaNj6xr2sXr/edkfbV08rVdHZ1wvEH0CuW5uTRULqVg+COgA9SE9Kb8Zwr2ElTUusuhkuFt1sngMMUCr954XPr916bRqHRZ8rR3xEuarg60rW2ZZW2wli8eWrWvYY/Xe34XPb136ULkSW176gDiB8tC6psDLkpODSBNopei023bSyi7gNwRoAuE3S1/h8gsbZQUlQFBNwYfTLpQAFer5+EmBNyE5eGzFuoawcu+v/JPblz7SrwQWbIvsJxBsa6AUNqSwdcpQPx8IsypA1o1KDr5peQlbuVs0fi7bj5/CwoJ1bYDtsr+EZSCkBxZgcywDVHaWUyO2bTQLEOA0dqGwRYYZQvuUVqhiCsFWaFMY0Gug7csfW5fgA1SjbAK0cvdPk+NGzKqlKBMI6qzCh9MugwBx/HTEpLEQEwjnfHIEpGmDkADcViDUUBN4qerlaU+glTt/ZJ7ZvvKJcg3RyLcu396uDcxPKPMCGsGvVrlCiNdA5JdqgJZzA/Ylr18y+Qbmm9wpTiASMf9eGP6LigwXBesVyQlEInoBWr7ze+aZl1c+VTt6xPJtzLe6O5xAJMIAkYjpv8pw8Xo0w0vNWnXa3oV52Y1ZXmpWqlPpErb8w286B6KUWsPNXgO9/O4zq0PHx7CZfBFNIgwQiTBAJGJ4F+bldibDUdkapXICkQgDRCIDqzeJg785vYyjsnVK5QQiEQaIRBggElkIIVF55Okct/gx3vy1ecH2ZQN2uI8TaLz5bPpri39hP/UuQLOb3crGtx5HX8wCZNLx/EGFZbQeR3kZypQCtHP1C50DVVDo8njzGcgoUmt4Xy5hFfs695aX/YcgGdKhdhdmdpuQPnaunqnownjzWY1q99RckZKdq2c0l2bb24UerPH1Y2etOkNP96l2pubx5tPS9KydUV6XbW/7cglL7ZOh26WxmOPLekIvQPnNA9wJYUnVAe1IvmbNMvo1gYK4uRUJM0mPud4FKLR0IWv0d0ZM8y7M9MXe3sfO2tmKpjTN0M7aWauFmHdVdQLlt218+4lmAbOqM+RFvoHK6+rjJWyqlV7HEcS59TpAcj1PTwghOfSW9o/oGuWm7sR0G/L11GRbdsDoJCeQfQ5cWwhJov3IGd1+YlDGzGOyfq5p4ybr52xrLh6c6mUYTKA5dktBo6oiWEJbUC5ho1u/WJdQdwMQ0oPQrpRNgBD2YD6wlVsVhjKBAsZZBZuPWQiNmgIKEIjZDE3Wz2V+a1ERtOTQ22Y/7mR063H+ycn6l/qV5I1uPZ6tJPNbQ2hNs5xAIFtSKFObo1KVwV3CCs8wSgE2xzhAhWcPYJsQoF28UqafVF8BsypA1o2yv4RNrhUNoQ0OoT0KG1LYOmX2AQrM0H5g0xPU39La6H2ZaePMCzN+lJ9I9rUFnI93mVz7yroET3DahRKgUNKU0cYj/UpwFC4fJz0BKkCBGdoLPz0hhAX7q+jeR6HRxiPzwpQfZaeNeWGZB9YECiHslpxhwz7NobLFljXHULL0DuLP7Rpu/Fz4/O61r5Ur0edr7XATKFXWrLLmRsNXekIIydJxxAmUGt4sjcvuddCGzs3pYkEnUKqicRXt9shpegJ4gEI/MuQ3PQH8EjZVnRX8LpeJYF3J0vHPrWuoZXjzp4o/3b3+jVolbYljRW4ClIqj6XGsIuUsQGG/7gfsDXBdfCF/AQo1tiHg7YTHmutwGaCUly3xUud8HAco1NubYLc94OW1Ilk6bv9jUISGNx/W/Mrd6+e7K2MKrZ5OJUsn3AcoNfz+YaOv371xPpqjG4onQKH5LmbU31S1A+GLKkBTwg3uSEy5mYozQCmcGEUZnVRyON4ATZ00StKreHMzlRw+0aMf8nDy+x8VjvLqxrcKRwHRrwDNajdMvQrNrP4GKKNpnnqbmAwGiETQ35FI4FA/H4ic4AQikUHgCCIBTiASYYBIhAEiEQaIRBggEuFdGIlwApEIA0Qi/FYGiXACkciAA4gkeBdGIryEkQgDRCIMEIkwQCTCAJEI78JIhBOIRPitDBLhBCIRBohEGCAS4V0YiXACkQgDRCIMEIkwQCTCAJHI/+vaGbbHUNOjAAAAAElFTkSuQmCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4eee1;
+  --paper-2:#efe7d6;
+  --card:#fbf7ee;
+  --ink:#26211a;
+  --ink-soft:#5b5346;
+  --line:#e0d6c2;
+  --green:#1f3d2f;
+  --green-soft:#33614a;
+  --clay:#b5532f;
+  --gold:#9a7b1f;
+  --shadow:0 1px 2px rgba(38,33,26,.06),0 8px 24px rgba(38,33,26,.06);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{
+  min-height:100vh;
+  background-image:radial-gradient(circle at 12% -10%,#fbf6ea 0,transparent 42%),radial-gradient(circle at 100% 0,#ece2cd 0,transparent 38%);
+  padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 28px);
+}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px}
+header{display:flex;align-items:center;gap:14px;padding:26px 0 18px}
+.mono-badge{
+  width:46px;height:46px;flex:none;border-radius:13px;background:var(--green);color:#f4eee1;
+  display:grid;place-items:center;font-family:"Fraunces",serif;font-weight:600;font-size:18px;letter-spacing:.5px;
+  box-shadow:var(--shadow)
+}
+header h1{font-family:"Fraunces",serif;font-weight:600;font-size:25px;line-height:1.05}
+header p{color:var(--ink-soft);font-size:13px;margin-top:2px}
+section{margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card.pad{padding:18px}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--ink-soft);font-weight:600}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;box-shadow:var(--shadow)}
+.stat .v{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:27px;margin-top:7px;letter-spacing:-.5px}
+.stat .u{font-size:13px;color:var(--ink-soft);font-weight:400}
+.stat small{display:block;margin-top:3px;font-size:12px;color:var(--ink-soft);font-family:"DM Sans",sans-serif;letter-spacing:0}
+.down{color:var(--green-soft)} .up{color:var(--clay)}
+/* plan / rasjoner */
+.plan-card{padding:18px}
+.plan-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.plan-head h2{font-family:"Fraunces",serif;font-weight:500;font-size:18px}
+.plan-status{font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+.plan-status b{color:var(--green-soft);font-weight:600}
+.plan-status b.behind{color:var(--clay)}
+.meals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:540px){.meals{grid-template-columns:repeat(2,1fr)}}
+.meal{background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.meal .mi{font-size:18px}
+.meal .mn{font-size:12px;color:var(--ink-soft);font-weight:600;margin-top:3px}
+.meal .mv{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:21px;margin-top:5px;letter-spacing:-.5px}
+.meal .mv .u{font-size:11px;color:var(--ink-soft);font-weight:400}
+.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.mini{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+.mini .k{font-size:11px;color:var(--ink-soft);font-weight:600}
+.mini .vv{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:17px;margin-top:4px}
+/* chart */
+.chart-card{padding:16px 14px 8px}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px}
+.chart-head h2{font-family:"Fraunces",serif;font-weight:500;font-size:17px}
+.chart-toggle{display:flex;gap:6px}
+.chip{font-size:11px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer}
+.chip.on{background:var(--green);color:var(--paper);border-color:var(--green)}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.empty{padding:34px 16px;text-align:center;color:var(--ink-soft);font-size:14px}
+/* form */
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.field{flex:1;min-width:120px}
+.field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;font-weight:500}
+input,button,select{font-family:inherit;font-size:16px}
+input[type=date],input[type=number],input[type=text]{
+  width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:#fffdf8;color:var(--ink);
+}
+input:focus{outline:2px solid var(--green-soft);outline-offset:1px;border-color:transparent}
+.btn{
+  appearance:none;border:none;cursor:pointer;border-radius:11px;padding:13px 18px;font-weight:600;font-size:15px;
+  background:var(--green);color:#f4eee1;transition:transform .08s ease,filter .15s ease;width:100%
+}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--green);border:1px solid var(--line)}
+.btn.clay{background:var(--clay)}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+/* list */
+.entry{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:none}
+.entry .date{font-size:13px;color:var(--ink-soft);width:96px;flex:none}
+.entry .w{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:17px}
+.entry .d{font-family:"JetBrains Mono",monospace;font-size:12px;margin-left:6px}
+.entry .sp{flex:1}
+.iconbtn{background:none;border:none;cursor:pointer;color:var(--ink-soft);font-size:18px;padding:6px;border-radius:8px;line-height:1}
+.iconbtn:active{background:var(--paper-2)}
+.listcap{padding:10px 16px;text-align:center}
+.listcap button{background:none;border:none;color:var(--green-soft);font-weight:600;font-size:13px;cursor:pointer}
+details.tools{margin-top:18px}
+details.tools summary{
+  list-style:none;cursor:pointer;font-family:"Fraunces",serif;font-size:16px;font-weight:500;
+  padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  display:flex;justify-content:space-between;align-items:center
+}
+details.tools summary::-webkit-details-marker{display:none}
+details.tools[open] summary{border-radius:var(--radius) var(--radius) 0 0;border-bottom:none}
+.tools-body{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:18px}
+.subhead{font-family:"Fraunces",serif;font-size:15px;font-weight:500;margin:18px 0 10px}
+.hint{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-top:10px}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:12px;font-size:14px;
+  box-shadow:var(--shadow);opacity:0;transition:.25s;z-index:50;max-width:90%
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;line-height:1.5}
+.installbar{display:none;align-items:center;gap:10px;margin-top:16px;padding:13px 16px;background:var(--green);color:var(--paper);border-radius:var(--radius)}
+.installbar.show{display:flex}
+.installbar span{flex:1;font-size:14px}
+.installbar button{background:var(--paper);color:var(--green);border:none;padding:9px 14px;border-radius:9px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mono-badge">LMR</div>
+    <div>
+      <h1>Vektkontroll</h1>
+      <p>Privat vektlogg, alt lagres på din enhet</p>
+    </div>
+  </header>
+
+  <div class="installbar" id="installbar">
+    <span>Installer som app på enheten</span>
+    <button id="installBtn">Installer</button>
+  </div>
+
+  <section class="stats" id="stats"></section>
+
+  <!-- PLAN: mållinje & måltidsrasjoner (closed-loop fra Excel-arket) -->
+  <section class="card plan-card" id="planCard">
+    <div class="plan-head">
+      <h2>Dagens rasjoner</h2>
+      <span class="label" id="planTag"></span>
+    </div>
+    <div class="plan-status" id="planStatus"></div>
+    <div class="meals" id="meals"></div>
+    <div class="plan-grid" id="planGrid"></div>
+  </section>
+
+  <section class="card chart-card">
+    <div class="chart-head">
+      <h2>Utvikling</h2>
+      <div class="chart-toggle">
+        <button class="chip" id="rngAll">Alt</button>
+        <button class="chip on" id="rng1y">1 år</button>
+        <button class="chip" id="rng90">90 d</button>
+      </div>
+    </div>
+    <div id="chart"></div>
+  </section>
+
+  <section class="card pad">
+    <div class="label" style="margin-bottom:12px">Ny registrering</div>
+    <div class="row">
+      <div class="field" style="max-width:170px"><label for="d">Dato</label><input type="date" id="d"></div>
+      <div class="field"><label for="w">Vekt (kg)</label><input type="number" id="w" inputmode="decimal" step="0.1" min="20" max="400" placeholder="0,0"></div>
+    </div>
+    <div class="field" style="margin-top:10px"><label for="note">Notat (valgfritt)</label><input type="text" id="note" maxlength="80" placeholder="t.d. etter trening"></div>
+    <div class="btn-row"><button class="btn" id="addBtn">Lagre registrering</button></div>
+  </section>
+
+  <section class="card" id="listCard">
+    <div class="pad" style="padding-bottom:6px"><div class="label">Registreringer</div></div>
+    <div id="list"></div>
+  </section>
+
+  <details class="tools">
+    <summary>Innstillinger og sikkerhetskopi <span class="label">åpne</span></summary>
+    <div class="tools-body">
+      <div class="subhead">Plan og målvekt</div>
+      <div class="row">
+        <div class="field"><label for="pStart">Startvekt (kg)</label><input type="number" id="pStart" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="pMaal">Målvekt (kg)</label><input type="number" id="pMaal" inputmode="decimal" step="0.1"></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field" style="max-width:200px"><label for="pDato">Startdato</label><input type="date" id="pDato"></div>
+        <div class="field"><label for="pPeriode">Periode (dager)</label><input type="number" id="pPeriode" inputmode="numeric" step="1"></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label for="pFrokost">Frokost %</label><input type="number" id="pFrokost" inputmode="decimal" step="1"></div>
+        <div class="field"><label for="pLunsj">Lunsj %</label><input type="number" id="pLunsj" inputmode="decimal" step="1"></div>
+        <div class="field"><label for="pMiddag">Middag %</label><input type="number" id="pMiddag" inputmode="decimal" step="1"></div>
+        <div class="field"><label for="pKvelds">Kvelds %</label><input type="number" id="pKvelds" inputmode="decimal" step="1"></div>
+      </div>
+      <div class="field" style="margin-top:10px;max-width:200px"><label for="height">Høyde (cm, for BMI)</label><input type="number" id="height" inputmode="numeric" step="1" placeholder="valgfritt"></div>
+      <div class="btn-row"><button class="btn ghost" id="saveSettings">Lagre plan og innstillinger</button></div>
+      <p class="hint">Rasjonene er kg-ekvivalent: hvor mye du kan «spise inn» per måltid og fortsatt være på mållinjen. Summen av prosentene bør være 100.</p>
+
+      <div class="subhead">Historiske data</div>
+      <p class="hint">Appen er forhåndslastet med <b id="seedCount">0</b> historiske veiinger fra regnearket ditt (2017–2026). Bruk knappen om du har nullstilt og vil ha dem tilbake (dupliserer ikke datoer du allerede har).</p>
+      <div class="btn-row"><button class="btn ghost" id="loadHistBtn">Last inn historikk på nytt</button></div>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+      <div class="subhead" style="margin-top:0">Sikkerhetskopi</div>
+      <p class="hint">Eksporter laster ned alle data som én fil. Legg filen i Google Disk eller en annen trygg mappe. Importer henter dem tilbake på en ny enhet eller etter en nullstilling.</p>
+      <div class="btn-row">
+        <button class="btn ghost" id="exportBtn">Eksporter til fil</button>
+        <button class="btn ghost" id="importBtn">Importer fra fil</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+      <div class="btn-row"><button class="btn clay" id="wipeBtn">Slett alle data</button></div>
+    </div>
+  </details>
+
+  <footer>
+    Vektkontroll, LaMoRo. Data forlater aldri enheten din.<br>Automatisk lagret lokalt etter hver endring.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const KEY="vektkontroll_v1";
+const SEED_FLAG="vektkontroll_seeded_v1";
+const $=id=>document.getElementById(id);
+const fmt=(n,d=1)=>n.toLocaleString("no-NO",{minimumFractionDigits:d,maximumFractionDigits:d});
+const todayISO=()=>{const t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());return t.toISOString().slice(0,10);};
+
+/* ---- innebygd historikk fra regnearket (date, kg) ---- */
+const SEED_RAW=[
+["2017-07-16",86.1],["2017-07-17",85.4],["2017-07-18",85.0],["2017-07-19",84.9],["2017-07-20",83.7],["2017-07-21",84.3],
+["2017-07-22",83.5],["2017-07-30",87.3],["2017-07-31",86.7],["2017-08-01",86.7],["2017-08-02",85.5],["2017-08-03",84.9],
+["2017-08-04",85.2],["2017-08-05",85.7],["2017-08-06",85.9],["2017-08-07",86.2],["2017-08-08",86.3],["2017-08-09",84.6],
+["2017-08-10",83.7],["2017-08-11",83.3],["2017-08-12",83.4],["2017-08-13",84.5],["2017-08-14",83.2],["2017-08-15",82.5],
+["2017-08-16",82.7],["2017-08-17",83.5],["2017-08-18",83.7],["2017-08-19",84.4],["2017-08-20",85.7],["2017-08-21",85.0],
+["2017-08-22",84.6],["2017-08-23",83.4],["2017-08-24",83.7],["2017-08-25",84.6],["2017-08-26",84.5],["2017-08-27",84.6],
+["2017-08-28",84.7],["2017-08-29",84.9],["2017-08-30",82.8],["2017-08-31",83.5],["2017-09-01",82.5],["2017-09-02",83.9],
+["2017-09-03",83.5],["2017-09-04",84.5],["2017-09-05",83.7],["2017-09-06",81.8],["2017-09-07",82.0],["2017-09-08",81.6],
+["2017-09-09",82.3],["2017-09-10",82.4],["2017-09-11",83.9],["2017-09-12",84.5],["2017-09-13",82.5],["2017-09-14",82.6],
+["2017-09-15",82.6],["2017-09-16",83.2],["2017-09-17",84.0],["2017-10-24",85.8],["2017-10-26",85.6],["2017-10-27",83.6],
+["2017-10-28",85.4],["2017-10-29",85.6],["2017-10-30",85.4],["2018-01-06",88.5],["2018-01-07",88.7],["2018-01-08",88.4],
+["2018-01-09",87.5],["2018-01-10",87.6],["2018-01-11",87.7],["2018-01-12",87.4],["2018-01-13",87.9],["2018-01-14",87.8],
+["2018-01-15",87.4],["2018-01-16",85.7],["2018-01-17",86.2],["2018-01-18",86.4],["2018-01-19",85.7],["2018-01-20",86.6],
+["2018-01-21",87.0],["2018-01-22",87.5],["2018-01-23",87.4],["2018-01-24",87.2],["2018-01-25",86.9],["2018-01-26",87.4],
+["2018-01-27",87.8],["2018-01-28",88.0],["2018-01-29",88.0],["2018-01-30",87.2],["2018-05-11",89.2],["2018-05-19",89.5],
+["2018-05-20",88.7],["2018-05-21",88.2],["2018-05-22",88.2],["2018-05-23",88.0],["2018-05-24",87.3],["2018-05-25",86.2],
+["2018-05-26",87.3],["2018-05-27",87.3],["2018-06-08",85.2],["2018-11-05",90.0],["2018-11-06",90.3],["2018-11-07",90.2],
+["2018-11-08",90.0],["2018-11-09",88.9],["2018-11-10",89.0],["2018-11-19",89.6],["2018-11-25",92.3],["2019-01-02",91.7],
+["2019-01-03",91.6],["2019-01-04",91.0],["2019-01-05",90.9],["2019-01-06",91.1],["2019-01-07",90.9],["2019-01-08",89.0],
+["2019-01-09",88.9],["2019-01-10",89.3],["2019-01-11",89.7],["2019-01-12",89.9],["2019-01-13",91.5],["2019-01-14",89.6],
+["2019-01-15",89.3],["2019-01-16",88.8],["2019-01-17",88.5],["2019-01-18",88.5],["2019-01-19",88.0],["2019-01-20",89.6],
+["2019-01-21",89.1],["2019-01-22",88.9],["2019-01-23",88.9],["2019-01-24",88.7],["2019-01-25",89.6],["2019-01-26",89.2],
+["2019-01-27",90.4],["2019-01-29",89.3],["2019-01-30",88.2],["2019-01-31",88.8],["2019-02-01",89.1],["2019-02-02",89.3],
+["2019-02-03",89.5],["2019-02-05",89.6],["2019-02-11",90.2],["2019-02-12",90.9],["2019-02-14",89.9],["2019-02-17",89.7],
+["2019-02-18",89.0],["2019-02-19",88.6],["2019-02-20",89.0],["2019-02-24",88.4],["2019-02-25",87.2],["2019-02-26",86.9],
+["2019-02-27",85.3],["2019-03-01",86.4],["2019-08-14",93.4],["2019-08-15",92.0],["2019-08-16",92.2],["2019-11-02",93.4],
+["2019-11-03",93.4],["2019-11-05",93.4],["2019-11-06",93.7],["2019-11-07",93.0],["2019-11-08",92.1],["2019-11-10",93.9],
+["2019-12-29",97.4],["2019-12-30",96.2],["2019-12-31",94.7],["2020-01-01",95.7],["2020-01-02",95.1],["2020-01-03",95.1],
+["2020-01-04",96.7],["2020-01-05",95.8],["2020-01-06",96.2],["2020-01-07",95.3],["2020-01-08",95.5],["2020-01-09",95.5],
+["2020-01-10",94.4],["2020-01-11",94.3],["2020-01-12",95.5],["2020-01-13",95.5],["2020-01-14",93.7],["2020-01-15",94.5],
+["2020-01-16",93.5],["2020-01-17",92.5],["2020-01-18",92.2],["2020-01-19",91.3],["2020-01-20",90.1],["2020-01-21",91.3],
+["2020-01-22",91.2],["2020-01-23",91.8],["2020-01-24",90.1],["2020-01-25",90.8],["2020-01-26",91.3],["2020-01-27",92.8],
+["2020-01-28",92.3],["2020-01-29",92.7],["2020-01-30",92.4],["2020-01-31",92.8],["2020-02-01",92.9],["2020-02-02",93.0],
+["2020-02-03",94.5],["2020-02-04",93.7],["2020-02-05",93.0],["2020-02-06",92.9],["2020-02-07",93.9],["2020-02-08",93.5],
+["2020-02-09",95.0],["2020-02-10",94.5],["2020-02-11",93.6],["2020-02-12",93.4],["2020-02-13",93.9],["2020-02-14",93.5],
+["2020-02-15",93.4],["2020-02-16",93.3],["2020-02-17",93.6],["2020-02-18",93.7],["2020-04-14",93.9],["2020-04-16",94.2],
+["2020-04-17",94.7],["2020-04-18",94.4],["2020-04-19",94.6],["2020-04-20",94.5],["2020-04-23",93.8],["2020-04-24",92.5],
+["2020-04-25",93.9],["2020-04-26",93.5],["2020-04-27",92.8],["2020-05-02",92.7],["2020-05-03",93.5],["2020-05-04",94.0],
+["2021-12-30",99.5],["2021-12-31",99.3],["2022-01-02",99.9],["2022-01-03",98.9],["2022-01-04",98.7],["2022-01-05",99.0],
+["2022-01-07",98.7],["2022-01-08",99.3],["2022-01-11",99.1],["2022-01-12",98.0],["2022-01-14",98.4],["2022-01-19",99.0],
+["2022-01-21",97.7],["2022-01-23",98.2],["2022-01-25",97.1],["2022-01-26",95.0],["2022-01-27",94.1],["2022-01-29",95.2],
+["2022-01-30",95.2],["2022-01-31",95.1],["2023-01-11",101.6],["2023-01-16",101.3],["2024-05-09",108.0],["2024-05-10",106.8],
+["2024-05-11",107.4],["2024-05-12",107.1],["2024-05-13",107.1],["2024-05-14",107.1],["2024-05-15",106.9],["2024-05-16",107.6],
+["2025-06-10",110.7],["2025-06-21",110.5],["2025-06-24",110.5],["2025-06-29",112.3],["2025-07-05",111.1],["2025-07-17",111.3],
+["2025-07-20",109.5],["2025-07-21",109.2],["2025-07-22",110.2],["2025-07-24",109.9],["2025-07-25",110.3],["2025-07-28",110.4],
+["2025-07-29",109.4],["2025-08-03",111.3],["2025-08-28",112.1],["2025-09-08",111.4],["2025-09-21",112.4],["2025-10-11",111.4],
+["2025-10-21",111.9],["2025-10-22",111.4],["2025-10-23",111.9],["2025-10-24",111.9],["2025-10-25",111.5],["2025-10-26",112.4],
+["2025-10-27",111.7],["2025-10-31",111.6],["2025-11-01",111.6],["2025-11-02",112.9],["2025-11-03",111.3],["2025-11-04",111.0],
+["2025-11-05",111.7],["2025-11-06",110.7],["2025-11-07",111.8],["2025-11-12",112.0],["2025-11-22",110.9],["2025-12-12",110.9],
+["2025-12-20",111.9],["2025-12-22",111.2],["2025-12-27",113.7],["2026-01-15",111.3],["2026-02-11",113.1],["2026-02-14",112.4],
+["2026-02-18",113.4],["2026-03-11",113.2],["2026-03-18",112.7],["2026-03-27",113.2],["2026-04-01",114.1],["2026-04-18",113.9],
+["2026-04-26",113.7],["2026-05-10",114.3],["2026-05-17",113.9],["2026-06-04",113.6]
+];
+const SEED=SEED_RAW.map(p=>({date:p[0],w:p[1],note:""}));
+
+/* ---- standardplan fra «Ny periode 2026» ---- */
+function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:"2026-01-05",periode:90,frokost:30,lunsj:10,middag:50,kvelds:10};}
+
+let state={entries:[],goal:null,height:null,plan:defaultPlan()};
+let chartRange="1y"; // all | 1y | 90
+
+/* ---- lagring ---- */
+function load(){
+  try{const raw=localStorage.getItem(KEY);if(raw)state=Object.assign(state,JSON.parse(raw));}catch(e){}
+  state.plan=Object.assign(defaultPlan(),state.plan||{});
+  state.entries=(state.entries||[]).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function maybeSeed(){
+  if(localStorage.getItem(KEY)||localStorage.getItem(SEED_FLAG))return;
+  state.entries=SEED.map(e=>({...e}));
+  state.goal=state.plan.maalvekt;
+  localStorage.setItem(SEED_FLAG,"1");
+  save();
+}
+function loadHistory(){
+  const have=new Set(state.entries.map(e=>e.date));
+  let added=0;
+  SEED.forEach(s=>{if(!have.has(s.date)){state.entries.push({...s});added++;}});
+  state.entries.sort((a,b)=>a.date.localeCompare(b.date));
+  save();render();
+  toast(added?("La til "+added+" historiske veiinger"):"Historikken er allerede lagt inn");
+}
+
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function fmtDate(iso){const[y,m,d]=iso.split("-");return d+"."+m+"."+y.slice(2);}
+
+/* ---- registreringer ---- */
+function addEntry(){
+  const date=$("d").value||todayISO();
+  const w=parseFloat(($("w").value||"").replace(",","."));
+  if(!w||w<20||w>400){toast("Skriv inn en gyldig vekt");return;}
+  const note=$("note").value.trim();
+  const i=state.entries.findIndex(e=>e.date===date);
+  const obj={date,w:Math.round(w*10)/10,note};
+  if(i>=0)state.entries[i]=obj;else state.entries.push(obj);
+  state.entries.sort((a,b)=>a.date.localeCompare(b.date));
+  save();$("w").value="";$("note").value="";render();
+  toast(i>=0?"Registrering oppdatert":"Registrering lagret");
+}
+function delEntry(date){
+  if(!confirm("Slette registreringen for "+fmtDate(date)+"?"))return;
+  state.entries=state.entries.filter(e=>e.date!==date);save();render();toast("Slettet");
+}
+function editEntry(date){
+  const e=state.entries.find(x=>x.date===date);if(!e)return;
+  $("d").value=e.date;$("w").value=String(e.w).replace(".",",");$("note").value=e.note||"";
+  window.scrollTo({top:0,behavior:"smooth"});
+  toast("Endre verdiene og lagre på nytt");
+}
+
+/* ---- planmatematikk (closed-loop) ---- */
+function addDays(iso,n){const t=new Date(iso+"T00:00:00");t.setDate(t.getDate()+n);return t.toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((Date.parse(b+"T00:00:00")-Date.parse(a+"T00:00:00"))/864e5);}
+function tapPerDag(p){return p.periode>1?(p.startvekt-p.maalvekt)/(p.periode-1):0;}
+function planEnd(p){return addDays(p.startdato,p.periode-1);}
+function maallinje(p,iso){
+  const dag=Math.max(1,Math.min(p.periode,daysBetween(p.startdato,iso)+1));
+  return p.startvekt-tapPerDag(p)*(dag-1);
+}
+function rations(p,weight,iso){
+  const ml=maallinje(p,iso);
+  const diff=ml-weight;
+  const f=v=>Math.max(diff*v/100,0);
+  return{ml,diff,frokost:f(p.frokost),lunsj:f(p.lunsj),middag:f(p.middag),kvelds:f(p.kvelds),
+         total:f(p.frokost)+f(p.lunsj)+f(p.middag)+f(p.kvelds)};
+}
+
+/* ---- statistikk-kort ---- */
+function computeStats(){
+  const e=state.entries;if(!e.length)return null;
+  const first=e[0],last=e[e.length-1];
+  const change=last.w-first.w;
+  const toGoal=state.goal!=null?last.w-state.goal:null;
+  const bmi=state.height?last.w/Math.pow(state.height/100,2):null;
+  let ma7=null;const recent=e.slice(-7);if(recent.length)ma7=recent.reduce((s,x)=>s+x.w,0)/recent.length;
+  return{current:last.w,change,toGoal,bmi,ma7,first:first.w,n:e.length,lastDate:last.date};
+}
+function renderStats(){
+  const s=computeStats();const el=$("stats");
+  if(!s){el.innerHTML='<div class="stat" style="grid-column:1/-1"><div class="label">Kom i gang</div><small>Legg inn din første vekt nedenfor.</small></div>';return;}
+  const chCls=s.change<0?"down":s.change>0?"up":"";
+  let cards=[
+    '<div class="stat"><div class="label">Nåværende</div><div class="v">'+fmt(s.current)+' <span class="u">kg</span></div><small>'+s.n+' registreringer</small></div>',
+    '<div class="stat"><div class="label">Endring</div><div class="v '+chCls+'">'+(s.change>0?"+":"")+fmt(s.change)+' <span class="u">kg</span></div><small>siden start</small></div>'
+  ];
+  if(s.toGoal!=null){
+    const reached=Math.abs(s.toGoal)<0.05;
+    cards.push('<div class="stat"><div class="label">Til mål</div><div class="v">'+(reached?"Nådd":fmt(Math.abs(s.toGoal)))+(reached?"":' <span class="u">kg</span>')+'</div><small>mål '+fmt(state.goal)+' kg</small></div>');
+  }
+  if(s.bmi!=null){
+    cards.push('<div class="stat"><div class="label">BMI</div><div class="v">'+s.bmi.toFixed(1)+'</div><small>7-dagers snitt '+fmt(s.ma7)+' kg</small></div>');
+  }else if(s.toGoal==null){
+    cards.push('<div class="stat"><div class="label">7-dagers snitt</div><div class="v">'+fmt(s.ma7)+' <span class="u">kg</span></div><small>glidende gjennomsnitt</small></div>');
+  }
+  el.innerHTML=cards.join("");
+}
+
+/* ---- plan / rasjoner-kort ---- */
+const MEALS=[["frokost","🥣","Frokost"],["lunsj","🥗","Lunsj"],["middag","🍽️","Middag"],["kvelds","🌙","Kvelds"]];
+function renderPlan(){
+  const p=state.plan,e=state.entries;
+  const today=todayISO(),end=planEnd(p);
+  $("planTag").textContent=fmt(p.startvekt,1)+" → "+fmt(p.maalvekt,1)+" kg";
+
+  if(!e.length){
+    $("planStatus").innerHTML="Logg en vekt for å se dagens måltidsrasjoner.";
+    $("meals").innerHTML="";$("planGrid").innerHTML="";return;
+  }
+  const todayEntry=e.find(x=>x.date===today);
+  const refW=todayEntry?todayEntry.w:e[e.length-1].w;
+  const r=rations(p,refW,today);
+
+  // status-tekst
+  let phase,cls="";
+  if(today<p.startdato)phase="Planen starter "+fmtDate(p.startdato);
+  else if(today>end)phase="Perioden fullført "+fmtDate(end);
+  else phase="Dag "+(daysBetween(p.startdato,today)+1)+" av "+p.periode;
+  const avvik=refW-r.ml;
+  const aTxt=Math.abs(avvik)<0.05?"på mållinjen":(avvik<0?fmt(-avvik)+" kg foran skjema":fmt(avvik)+" kg bak skjema");
+  cls=avvik<=0.05?"":"behind";
+  $("planStatus").innerHTML=phase+" · mållinje <b>"+fmt(r.ml)+" kg</b> · <b class='"+cls+"'>"+aTxt+"</b>"+(todayEntry?"":" <span style='opacity:.7'>(siste vekt)</span>");
+
+  $("meals").innerHTML=MEALS.map(m=>
+    '<div class="meal"><div class="mi">'+m[1]+'</div><div class="mn">'+m[2]+'</div><div class="mv">'+fmt(r[m[0]],2)+'<span class="u"> kg</span></div></div>'
+  ).join("");
+
+  // prognose
+  const inPlan=e.filter(x=>x.date>=p.startdato&&x.date<=end);
+  let tapDag=null,proj=null;
+  if(inPlan.length>=2){
+    const f=inPlan[0],l=inPlan[inPlan.length-1],days=daysBetween(f.date,l.date);
+    if(days>0){tapDag=(f.w-l.w)/days;proj=l.w-tapDag*Math.max(0,daysBetween(l.date,end));}
+  }
+  const daysLeft=Math.max(0,daysBetween(today,end));
+  const pct=Math.max(0,Math.min(1,(p.startvekt-refW)/(p.startvekt-p.maalvekt||1)));
+  const mini=[
+    ["Tillatt totalt i dag",fmt(r.total,2)+" kg"],
+    ["% av mål nådd",Math.round(pct*100)+" %"],
+    ["Faktisk tap/dag",tapDag!=null?fmt(tapDag,3)+" kg":"–"],
+    ["Forventet sluttvekt",proj!=null?fmt(proj,1)+" kg":"–"],
+    ["Dager igjen",daysLeft],
+    ["Sluttdato",fmtDate(end)]
+  ];
+  $("planGrid").innerHTML=mini.map(m=>'<div class="mini"><div class="k">'+m[0]+'</div><div class="vv">'+m[1]+'</div></div>').join("");
+}
+
+/* ---- graf ---- */
+function visibleEntries(){
+  const e=state.entries;if(!e.length)return e;
+  if(chartRange==="all")return e;
+  const days=chartRange==="90"?90:365;
+  const cut=addDays(e[e.length-1].date,-days);
+  return e.filter(o=>o.date>=cut);
+}
+function renderChart(){
+  const host=$("chart");const e=visibleEntries();
+  if(e.length<2){host.innerHTML='<div class="empty">Grafen vises når du har minst to registreringer i valgt periode.</div>';return;}
+  const p=state.plan,end=planEnd(p);
+  const W=640,H=240,padL=40,padR=14,padT=14,padB=28;
+  const ys=e.map(o=>o.w);
+  let lo=Math.min(...ys),hi=Math.max(...ys);
+  if(state.goal!=null){lo=Math.min(lo,state.goal);hi=Math.max(hi,state.goal);}
+  // mållinje-punkter for registreringer i planperioden
+  const tgt=e.map((o,i)=>(o.date>=p.startdato&&o.date<=end)?{i,v:maallinje(p,o.date)}:null).filter(Boolean);
+  tgt.forEach(t=>{lo=Math.min(lo,t.v);hi=Math.max(hi,t.v);});
+  const span=Math.max(hi-lo,1);lo-=span*0.15;hi+=span*0.15;
+  const X=i=>padL+(W-padL-padR)*(i/(e.length-1));
+  const Y=v=>padT+(H-padT-padB)*(1-(v-lo)/(hi-lo));
+  const line=e.map((o,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(o.w).toFixed(1)).join(" ");
+  const area=line+" L "+X(e.length-1).toFixed(1)+" "+(H-padB).toFixed(1)+" L "+X(0).toFixed(1)+" "+(H-padB).toFixed(1)+" Z";
+  let grid="",ticks=4;
+  for(let i=0;i<=ticks;i++){const v=lo+(hi-lo)*i/ticks;const y=Y(v).toFixed(1);
+    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
+    grid+='<text x="'+(padL-6)+'" y="'+(+y+4)+'" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+v.toFixed(0)+'</text>';
+  }
+  let goalLine="";
+  if(state.goal!=null){const gy=Y(state.goal).toFixed(1);
+    goalLine='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--clay)" stroke-width="1.5" stroke-dasharray="5 4"/>'+
+             '<text x="'+(W-padR)+'" y="'+(+gy-5)+'" text-anchor="end" font-size="10" fill="var(--clay)" font-family="JetBrains Mono,monospace">mål '+fmt(state.goal)+'</text>';}
+  let tgtLine="";
+  if(tgt.length>=2){
+    const tp=tgt.map((t,i)=>(i?"L":"M")+X(t.i).toFixed(1)+" "+Y(t.v).toFixed(1)).join(" ");
+    tgtLine='<path d="'+tp+'" fill="none" stroke="var(--green-soft)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.8"/>';
+  }
+  const dots=e.map((o,i)=>'<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(o.w).toFixed(1)+'" r="'+(i===e.length-1?4:2)+'" fill="var(--green)"/>').join("");
+  const firstLbl='<text x="'+padL+'" y="'+(H-8)+'" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtDate(e[0].date)+'</text>';
+  const lastLbl='<text x="'+(W-padR)+'" y="'+(H-8)+'" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtDate(e[e.length-1].date)+'</text>';
+  host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Vektutvikling">'+
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="#33614a" stop-opacity="0.18"/><stop offset="1" stop-color="#33614a" stop-opacity="0"/>'+
+    '</linearGradient></defs>'+
+    grid+'<path d="'+area+'" fill="url(#g)"/>'+goalLine+tgtLine+
+    '<path d="'+line+'" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+    dots+firstLbl+lastLbl+'</svg>';
+}
+
+/* ---- liste ---- */
+let listLimit=30;
+function renderList(){
+  const host=$("list");const all=[...state.entries].reverse();
+  if(!all.length){host.innerHTML='<div class="empty">Ingen registreringer ennå.</div>';return;}
+  const e=all.slice(0,listLimit);
+  let html=e.map((o,idx)=>{
+    const prev=all[idx+1];let d="";
+    if(prev){const diff=o.w-prev.w;const c=diff<0?"down":diff>0?"up":"";d='<span class="d '+c+'">'+(diff>0?"+":"")+fmt(diff)+'</span>';}
+    const note=o.note?" · "+o.note.replace(/</g,"&lt;"):"";
+    return '<div class="entry"><span class="date">'+fmtDate(o.date)+note+'</span><span class="w">'+fmt(o.w)+'<span class="u" style="font-size:12px;color:var(--ink-soft)"> kg</span></span>'+d+'<span class="sp"></span>'+
+      '<button class="iconbtn" title="Endre" data-edit="'+o.date+'">✎</button>'+
+      '<button class="iconbtn" title="Slett" data-del="'+o.date+'">🗑</button></div>';
+  }).join("");
+  if(all.length>listLimit)html+='<div class="listcap"><button id="moreBtn">Vis flere ('+(all.length-listLimit)+' igjen)</button></div>';
+  host.innerHTML=html;
+  const mb=$("moreBtn");if(mb)mb.onclick=()=>{listLimit+=50;renderList();};
+}
+
+function render(){renderStats();renderPlan();renderChart();renderList();}
+
+/* ---- backup ---- */
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="vektkontroll-backup-"+todayISO()+".json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("Sikkerhetskopi lastet ned");
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{try{const data=JSON.parse(r.result);
+    if(!Array.isArray(data.entries))throw 0;
+    if(!confirm("Importere "+data.entries.length+" registreringer? Dette erstatter dagens data."))return;
+    state={entries:data.entries,goal:data.goal??null,height:data.height??null,plan:Object.assign(defaultPlan(),data.plan||{})};
+    state.entries.sort((a,b)=>a.date.localeCompare(b.date));save();fillSettings();render();toast("Data importert");
+  }catch(e){toast("Filen kunne ikke leses");}};
+  r.readAsText(file);
+}
+function fillSettings(){
+  const p=state.plan;
+  $("pStart").value=p.startvekt;$("pMaal").value=p.maalvekt;$("pDato").value=p.startdato;
+  $("pPeriode").value=p.periode;$("pFrokost").value=p.frokost;$("pLunsj").value=p.lunsj;
+  $("pMiddag").value=p.middag;$("pKvelds").value=p.kvelds;
+  $("height").value=state.height??"";
+  $("seedCount").textContent=SEED.length;
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  load();maybeSeed();
+  $("d").value=todayISO();fillSettings();render();
+
+  $("addBtn").onclick=addEntry;
+  $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
+  $("saveSettings").onclick=()=>{
+    const num=(id,def)=>{const v=parseFloat(($(id).value||"").replace(",","."));return isNaN(v)?def:v;};
+    const p=state.plan;
+    p.startvekt=num("pStart",p.startvekt);p.maalvekt=num("pMaal",p.maalvekt);
+    p.startdato=$("pDato").value||p.startdato;p.periode=Math.max(2,Math.round(num("pPeriode",p.periode)));
+    p.frokost=num("pFrokost",p.frokost);p.lunsj=num("pLunsj",p.lunsj);
+    p.middag=num("pMiddag",p.middag);p.kvelds=num("pKvelds",p.kvelds);
+    const h=parseFloat($("height").value);state.height=isNaN(h)?null:Math.round(h);
+    if(state.goal==null)state.goal=p.maalvekt;
+    save();render();toast("Plan og innstillinger lagret");
+  };
+  $("loadHistBtn").onclick=loadHistory;
+  $("exportBtn").onclick=exportData;
+  $("importBtn").onclick=()=>$("importFile").click();
+  $("importFile").onchange=ev=>{if(ev.target.files[0])importData(ev.target.files[0]);ev.target.value="";};
+  $("wipeBtn").onclick=()=>{if(confirm("Slette ALLE data permanent? Eksporter en kopi først hvis du er usikker."))
+    {localStorage.removeItem(KEY);state={entries:[],goal:null,height:null,plan:defaultPlan()};fillSettings();render();toast("Alle data slettet");}};
+  $("list").addEventListener("click",ev=>{
+    const ed=ev.target.dataset.edit,dl=ev.target.dataset.del;
+    if(ed)editEntry(ed);if(dl)delEntry(dl);
+  });
+  const ranges={rngAll:"all",rng1y:"1y",rng90:"90"};
+  Object.keys(ranges).forEach(id=>$(id).onclick=()=>{
+    chartRange=ranges[id];
+    Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",x===id));
+    renderChart();
+  });
+});
+
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installbar").classList.add("show");});
+window.addEventListener("DOMContentLoaded",()=>{
+  $("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installbar").classList.remove("show");};
+});
+window.addEventListener("appinstalled",()=>$("installbar").classList.remove("show"));
+</script>
+</body>
+</html>
