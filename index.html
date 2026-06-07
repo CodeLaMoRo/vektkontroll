@@ -129,6 +129,36 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
 .installbar.show{display:flex}
 .installbar span{flex:1;font-size:14px}
 .installbar button{background:var(--paper);color:var(--green);border:none;padding:9px 14px;border-radius:9px;font-weight:600;cursor:pointer}
+/* faner */
+.tabs{display:flex;gap:6px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;box-shadow:var(--shadow);position:sticky;top:6px;z-index:10}
+.tab{flex:1;border:none;background:transparent;color:var(--ink-soft);font-family:inherit;font-size:15px;font-weight:600;padding:11px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+.tab.on{background:var(--green);color:var(--paper)}
+/* åpne/lukk-etikett på details */
+details[open] .lbl-open{display:none}
+details:not([open]) .lbl-close{display:none}
+/* matvekt */
+.mealpick{display:flex;gap:6px;flex-wrap:wrap}
+.mealpick .chip{font-size:13px;padding:7px 12px}
+.meal-group{border-top:1px solid var(--line)}
+.meal-group:first-child{border-top:none}
+.mg-head{display:flex;justify-content:space-between;align-items:baseline;padding:10px 16px 2px;font-weight:600;font-size:14px}
+.mg-sub{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-soft);font-weight:700}
+.mg-sub.over{color:var(--clay)}
+.mg-empty{padding:2px 16px 10px;font-size:12px;color:var(--ink-soft)}
+.daytot{display:flex;justify-content:space-between;align-items:baseline}
+.daytot .dv{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:30px;letter-spacing:-1px}
+/* måltidsliste */
+.meal-item{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--line)}
+.meal-item:last-child{border-bottom:none}
+.meal-item .nm{flex:1;font-size:14px}
+.meal-item .gq{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-soft)}
+.meal-item .gg{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px}
+.budget-bar{height:9px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden;margin:10px 0 6px}
+.budget-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green-soft),var(--green));transition:width .5s}
+.budget-fill.over{background:var(--clay)}
+.kref{display:grid;grid-template-columns:1fr auto}
+.kref div{padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kref .kv{font-family:"JetBrains Mono",monospace;text-align:right;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -146,6 +176,12 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
     <button id="installBtn">Installer</button>
   </div>
 
+  <nav class="tabs">
+    <button class="tab on" id="tabVekt">⚖️ Vekt</button>
+    <button class="tab" id="tabMat">🍽️ Mat</button>
+  </nav>
+
+  <div id="viewVekt">
   <section class="stats" id="stats"></section>
 
   <!-- PLAN: mållinje & måltidsrasjoner (closed-loop fra Excel-arket) -->
@@ -193,7 +229,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
   </section>
 
   <details class="tools">
-    <summary>Innstillinger og sikkerhetskopi <span class="label">åpne</span></summary>
+    <summary>Innstillinger og sikkerhetskopi <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary>
     <div class="tools-body">
       <div class="subhead">Plan og målvekt</div>
       <div class="row">
@@ -211,7 +247,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
         <div class="field"><label for="pKvelds">Kvelds %</label><input type="number" id="pKvelds" inputmode="decimal" step="1"></div>
       </div>
       <div class="field" style="margin-top:10px;max-width:200px"><label for="height">Høyde (cm, for BMI)</label><input type="number" id="height" inputmode="numeric" step="1" placeholder="valgfritt"></div>
-      <div class="btn-row"><button class="btn ghost" id="saveSettings">Lagre plan og innstillinger</button></div>
+      <div class="btn-row"><button class="btn" id="saveSettings" style="font-size:16px;padding:15px">💾 Lagre plan og innstillinger</button></div>
       <p class="hint">Metoden: <b>startvekt er kveldsvekten din</b> (etter siste måltid), høyere enn morgenvekten. Total mat i dag = dagens mållinje − morgenvekt, fordelt på måltidene etter prosentene (i gram). Siste måltid (kvelds) justeres av vekten du måler rett før det. Summen av prosentene bør være 100.</p>
 
       <div class="subhead">Dine data</div>
@@ -228,6 +264,52 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
       <div class="btn-row"><button class="btn clay" id="wipeBtn">Slett alle data</button></div>
     </div>
   </details>
+  </div><!-- /viewVekt -->
+
+  <div id="viewMat" hidden>
+    <section class="card pad" id="dayTotal"></section>
+
+    <section class="card pad">
+      <div class="label" style="margin-bottom:8px">Legg til mat</div>
+      <div class="mealpick" id="mealPick">
+        <button class="chip on" data-meal="frokost">🥣 Frokost</button>
+        <button class="chip" data-meal="lunsj">🥗 Lunsj</button>
+        <button class="chip" data-meal="middag">🍽️ Middag</button>
+        <button class="chip" data-meal="kvelds">🌙 Kvelds</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field" style="flex:2;min-width:160px"><label for="foodSel">Matvare</label><select id="foodSel"></select></div>
+        <div class="field" style="max-width:90px"><label for="foodQty">Antall</label><input type="number" id="foodQty" inputmode="decimal" step="0.5" min="0" value="1"></div>
+      </div>
+      <div class="hint" id="foodPreview" style="margin-top:8px"></div>
+      <div class="btn-row"><button class="btn" id="foodAddBtn">Legg til</button></div>
+    </section>
+
+    <section class="card">
+      <div class="pad" style="padding-bottom:6px;display:flex;justify-content:space-between;align-items:baseline">
+        <div class="label">Dagens måltider</div>
+        <button class="iconbtn" id="mealClear" style="font-size:13px;color:var(--clay)">Tøm dagen</button>
+      </div>
+      <div id="mealList"></div>
+    </section>
+
+    <section class="card pad">
+      <div class="label" style="margin-bottom:10px">Egen matvare</div>
+      <div class="row">
+        <div class="field" style="flex:2;min-width:140px"><label for="cfName">Navn</label><input type="text" id="cfName" maxlength="40" placeholder="t.d. Proteinbar"></div>
+        <div class="field" style="max-width:110px"><label for="cfGram">Gram/porsjon</label><input type="number" id="cfGram" inputmode="decimal" step="1" min="0"></div>
+      </div>
+      <div class="btn-row"><button class="btn ghost" id="cfAddBtn">Legg til i matlisten</button></div>
+    </section>
+
+    <details class="tools">
+      <summary>Referanse: hva gir 100 kcal <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary>
+      <div class="tools-body">
+        <p class="hint" style="margin-top:0">Gram av ulike matvarer som tilsvarer 100 kcal (lavere tall = mer kaloritett). Kilde: Frukt.no / Lise von Krogh.</p>
+        <div id="kcalRef"></div>
+      </div>
+    </details>
+  </div>
 
   <footer>
     Vektkontroll, LaMoRo. Data forlater aldri enheten din.<br>Automatisk lagret lokalt etter hver endring.
@@ -253,7 +335,7 @@ const SEED=SEED_RAW.map(p=>({date:p[0],w:p[1],note:""}));
 /* ---- standardplan fra «Ny periode 2026» ---- */
 function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),periode:90,frokost:30,lunsj:10,middag:50,kvelds:10};}
 
-let state={entries:[],goal:null,height:null,plan:defaultPlan()};
+let state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};
 let chartRange="all"; // all | 1y | 90 | 30 | 7
 let chartFrom="";      // egendefinert startdato for grafen (ISO) – overstyrer chartRange
 
@@ -261,6 +343,9 @@ let chartFrom="";      // egendefinert startdato for grafen (ISO) – overstyrer
 function load(){
   try{const raw=localStorage.getItem(KEY);if(raw)state=Object.assign(state,JSON.parse(raw));}catch(e){}
   state.plan=Object.assign(defaultPlan(),state.plan||{});
+  if(!state.meal||typeof state.meal!=="object")state.meal={date:"",items:[]};
+  if(!Array.isArray(state.meal.items))state.meal.items=[];
+  if(!Array.isArray(state.customFoods))state.customFoods=[];
   state.entries=(state.entries||[]).sort((a,b)=>a.date.localeCompare(b.date));
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state));}
@@ -493,6 +578,144 @@ function renderList(){
 
 function render(){renderStats();renderPlan();renderChart();renderList();}
 
+/* ---- Matvekt-fane ---- */
+const MATVARER=[
+{cat:"Måltid",name:"Brødskive med pålegg",g:50.0},
+{cat:"Måltid",name:"Grillpølse",g:60.0},
+{cat:"Måltid",name:"Pølsebrød",g:50.0},
+{cat:"Måltid",name:"Lompe",g:35.0},
+{cat:"Måltid",name:"Vaffel m. pålegg",g:65.0},
+{cat:"Måltid",name:"Hjemmelaget pizza, Peppes langpanne",g:1150.0},
+{cat:"Måltid",name:"1 skive grovbrød",g:30.0},
+{cat:"Måltid",name:"1 rundstykke",g:70.0},
+{cat:"Måltid",name:"1 ciabatta",g:100.0},
+{cat:"Måltid",name:"1 knekkebrød",g:10.0},
+{cat:"Pålegg",name:"1 tynt lag med smør",g:5.0},
+{cat:"Pålegg",name:"1 porsjon hvitost",g:10.0},
+{cat:"Pålegg",name:"1 porsjon brunost",g:10.0},
+{cat:"Pålegg",name:"1 porsjon skinke",g:10.0},
+{cat:"Pålegg",name:"1 egg",g:50.0},
+{cat:"Pålegg",name:"1 ss syltetøy",g:20.0},
+{cat:"Pålegg",name:"1 ss kremost",g:20.0},
+{cat:"Pålegg",name:"1 ss rekesalat",g:40.0},
+{cat:"Pålegg",name:"1 ss kyllingsalat",g:40.0},
+{cat:"Pålegg",name:"1 ss leverpostei",g:10.0},
+{cat:"Pålegg",name:"1 ss tunfisk",g:20.0},
+{cat:"Pålegg",name:"1 ss makrell i tomat",g:20.0},
+{cat:"Pålegg",name:"1 ss kaviar",g:20.0},
+{cat:"Pålegg",name:"3 biter sild",g:20.0},
+{cat:"Pålegg",name:"2 sardiner",g:20.0},
+{cat:"Pålegg",name:"Røkt laks til 1 skive",g:20.0},
+{cat:"Frukt",name:"1 eple",g:150.0},
+{cat:"Frukt",name:"1 appelsin",g:225.0},
+{cat:"Frukt",name:"1 banan",g:100.0},
+{cat:"Frukt",name:"10 druer",g:70.0},
+{cat:"Drikke",name:"1 glass melk",g:200.0},
+{cat:"Drikke",name:"1 glass eplejuice",g:200.0},
+{cat:"Drikke",name:"1 glass appelsinjuice",g:200.0},
+{cat:"Yoghurt",name:"1 lite beger yoghurt",g:125.0},
+{cat:"Yoghurt",name:"Go’ morgen yoghurt",g:195.0},
+{cat:"Potet/ris/pasta",name:"1 potet",g:80.0},
+{cat:"Potet/ris/pasta",name:"1 porsjon ris, rå",g:60.0},
+{cat:"Potet/ris/pasta",name:"1 prosjon pasta, rå",g:75.0}
+];
+const KCAL100=[
+{name:"Ananas",g100:200.0},
+{name:"Banan",g100:120.0},
+{name:"Gulrot",g100:300.0},
+{name:"Ost",g100:25.0},
+{name:"Mango",g100:150.0},
+{name:"Bringebær",g100:335.0},
+{name:"Avocado",g100:50.0},
+{name:"Tomat",g100:500.0},
+{name:"Eple",g100:200.0},
+{name:"Brunost, Gudbrandsdalsost",g100:22.0},
+{name:"Kokt egg",g100:70.0},
+{name:"Bacon med svor, rå",g100:30.0},
+{name:"Kokt skinke",g100:108.0},
+{name:"Kokt laks, oppdrett skivet",g100:37.5},
+{name:"Sei, rå",g100:145.0},
+{name:"Pinjekjerner",g100:14.5},
+{name:"Quinoa, kokt",g100:70.0},
+{name:"Vafler",g100:46.8},
+{name:"Mørk sjokolade, 70 prosent",g100:17.0},
+{name:"Sukker",g100:25.0},
+{name:"Kokosbolle, stor",g100:27.0},
+{name:"Ahlgrens biler",g100:27.5},
+{name:"Rapsolje",g100:11.0},
+{name:"Smør",g100:13.5},
+{name:"Brelett",g100:26.0},
+{name:"Iskrem, fløtebasert",g100:51.0},
+{name:"Lollipop",g100:83.7},
+{name:"Kokosmelk",g100:47.5},
+{name:"Wienerpølse",g100:40.0},
+{name:"Pizza Grandiosa, original",g100:44.0},
+{name:"Brød",g100:40.0},
+{name:"Lapskaus",g100:170.0},
+{name:"Salami",g100:35.0}
+];
+function fmtG(g){return Number.isInteger(g)?g:Number(g).toFixed(1);}
+function allFoods(){return MATVARER.concat((state.customFoods||[]).map(f=>({cat:"Egne matvarer",name:f.name,g:f.g})));}
+function foodBudgetG(){
+  const p=state.plan,e=state.entries,today=todayISO();
+  const te=e.find(x=>x.date===today)||(e.length?e[e.length-1]:null);
+  if(!te)return null;
+  return Math.round(Math.max(0,maallinje(p,today)-te.w)*1000);
+}
+function populateFoodSelect(){
+  const sel=$("foodSel");if(!sel)return;
+  const groups={};
+  allFoods().forEach((f,i)=>{(groups[f.cat]=groups[f.cat]||[]).push(Object.assign({i},f));});
+  sel.innerHTML=Object.keys(groups).map(cat=>
+    '<optgroup label="'+cat+'">'+groups[cat].map(f=>'<option value="'+f.i+'">'+f.name+' ('+fmtG(f.g)+' g)</option>').join("")+'</optgroup>'
+  ).join("");
+  updatePreview();
+}
+function updatePreview(){
+  const sel=$("foodSel");if(!sel)return;
+  const f=allFoods()[+sel.value];const qty=parseFloat(($("foodQty").value||"").replace(",","."))||0;
+  $("foodPreview").innerHTML=f?("= <b>"+Math.round(f.g*qty)+" g</b>  ("+fmtG(f.g)+" g × "+fmtG(qty)+")"):"";
+}
+const MEALKEYS=[["frokost","🥣","Frokost"],["lunsj","🥗","Lunsj"],["middag","🍽️","Middag"],["kvelds","🌙","Kvelds"]];
+let currentMeal="frokost";
+function renderDay(){
+  if(state.meal.date!==todayISO()){state.meal={date:todayISO(),items:[]};save();}
+  const items=state.meal.items,p=state.plan;
+  const total=Math.round(items.reduce((s,it)=>s+it.g*it.qty,0));
+  const budget=foodBudgetG();
+  // dagstotal-kort – oppdateres løpende
+  let dt='<div class="daytot"><span class="label">Spist i dag totalt</span><span class="dv">'+total+' g</span></div>';
+  if(budget!=null){
+    const pct=budget>0?Math.min(1,total/budget):(total>0?1:0);const over=total>budget;
+    dt+='<div class="budget-bar"><div class="budget-fill'+(over?' over':'')+'" style="width:'+(pct*100).toFixed(0)+'%"></div></div>';
+    dt+='<div class="hint" style="margin-top:0">'+(over?'<b style="color:var(--clay)">'+(total-budget)+' g over</b> dagens budsjett ('+budget+' g)':'<b>'+(budget-total)+' g igjen</b> av dagens budsjett ('+budget+' g)')+'</div>';
+  }else dt+='<div class="hint" style="margin-top:4px">Logg morgenvekt i Vekt-fanen for å se mot dagens budsjett.</div>';
+  $("dayTotal").innerHTML=dt;
+  // per måltid (med valgfri delbudsjett etter prosentene)
+  let h="";
+  MEALKEYS.forEach(([k,ico,label])=>{
+    const its=items.map((it,i)=>({it,i})).filter(o=>(o.it.meal||"frokost")===k);
+    const sub=Math.round(its.reduce((s,o)=>s+o.it.g*o.it.qty,0));
+    const mb=budget!=null?Math.round(budget*(p[k]||0)/100):null;
+    const over=mb!=null&&sub>mb;
+    h+='<div class="meal-group"><div class="mg-head"><span>'+ico+' '+label+'</span><span class="mg-sub'+(over?' over':'')+'">'+sub+' g'+(mb!=null?' / '+mb+' g':'')+'</span></div>';
+    h+=its.length?its.map(o=>'<div class="meal-item"><span class="nm">'+o.it.name.replace(/</g,"&lt;")+'</span><span class="gq">'+fmtG(o.it.g)+'×'+fmtG(o.it.qty)+'</span><span class="gg">'+Math.round(o.it.g*o.it.qty)+' g</span><button class="iconbtn" data-mdel="'+o.i+'" title="Fjern">🗑</button></div>').join(""):'<div class="mg-empty">–</div>';
+    h+='</div>';
+  });
+  $("mealList").innerHTML=h;
+}
+function renderKcalRef(){
+  const host=$("kcalRef");if(!host)return;
+  host.innerHTML='<div class="kref">'+KCAL100.map(k=>'<div>'+k.name+'</div><div class="kv">'+fmtG(k.g100)+' g</div>').join("")+'</div>';
+}
+function addFoodToMeal(){
+  const f=allFoods()[+$("foodSel").value];const qty=parseFloat(($("foodQty").value||"").replace(",","."));
+  if(!f||!qty||qty<=0){toast("Velg matvare og antall");return;}
+  if(state.meal.date!==todayISO())state.meal={date:todayISO(),items:[]};
+  state.meal.items.push({name:f.name,g:f.g,qty:Math.round(qty*100)/100,meal:currentMeal});
+  save();renderDay();toast("Lagt til i "+currentMeal);
+}
+
 /* ---- backup ---- */
 function exportData(){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
@@ -505,8 +728,8 @@ function importData(file){
   r.onload=()=>{try{const data=JSON.parse(r.result);
     if(!Array.isArray(data.entries))throw 0;
     if(!confirm("Importere "+data.entries.length+" registreringer? Dette erstatter dagens data."))return;
-    state={entries:data.entries,goal:data.goal??null,height:data.height??null,plan:Object.assign(defaultPlan(),data.plan||{})};
-    state.entries.sort((a,b)=>a.date.localeCompare(b.date));save();fillSettings();render();toast("Data importert");
+    state={entries:data.entries,goal:data.goal??null,height:data.height??null,plan:Object.assign(defaultPlan(),data.plan||{}),meal:data.meal||{date:"",items:[]},customFoods:data.customFoods||state.customFoods||[]};
+    state.entries.sort((a,b)=>a.date.localeCompare(b.date));save();fillSettings();render();populateFoodSelect();renderDay();toast("Data importert");
   }catch(e){toast("Filen kunne ikke leses");}};
   r.readAsText(file);
 }
@@ -521,6 +744,7 @@ function fillSettings(){
 document.addEventListener("DOMContentLoaded",()=>{
   load();maybeSeed();
   $("d").value=todayISO();fillSettings();render();
+  populateFoodSelect();renderKcalRef();renderDay();
 
   $("addBtn").onclick=addEntry;
   $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
@@ -546,7 +770,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("importBtn").onclick=()=>$("importFile").click();
   $("importFile").onchange=ev=>{if(ev.target.files[0])importData(ev.target.files[0]);ev.target.value="";};
   $("wipeBtn").onclick=()=>{if(confirm("Slette ALLE data permanent? Eksporter en kopi først hvis du er usikker."))
-    {localStorage.removeItem(KEY);state={entries:[],goal:null,height:null,plan:defaultPlan()};fillSettings();render();toast("Alle data slettet");}};
+    {localStorage.removeItem(KEY);state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};fillSettings();render();populateFoodSelect();renderDay();toast("Alle data slettet");}};
   $("list").addEventListener("click",ev=>{
     const ed=ev.target.dataset.edit,dl=ev.target.dataset.del;
     if(ed)editEntry(ed);if(dl)delEntry(dl);
@@ -562,6 +786,33 @@ document.addEventListener("DOMContentLoaded",()=>{
     Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",!chartFrom&&ranges[x]===chartRange));
     renderChart();
   });
+
+  // faner
+  function showTab(mat){
+    $("viewMat").hidden=!mat;$("viewVekt").hidden=mat;
+    $("tabMat").classList.toggle("on",mat);$("tabVekt").classList.toggle("on",!mat);
+    window.scrollTo({top:0,behavior:"smooth"});
+    if(mat){populateFoodSelect();renderDay();}
+  }
+  $("tabVekt").onclick=()=>showTab(false);
+  $("tabMat").onclick=()=>showTab(true);
+  // matvekt
+  $("mealPick").addEventListener("click",ev=>{
+    const b=ev.target.closest("button[data-meal]");if(!b)return;
+    currentMeal=b.dataset.meal;
+    [...$("mealPick").children].forEach(x=>x.classList.toggle("on",x===b));
+  });
+  $("foodSel").addEventListener("change",updatePreview);
+  $("foodQty").addEventListener("input",updatePreview);
+  $("foodAddBtn").onclick=addFoodToMeal;
+  $("mealClear").onclick=()=>{if(state.meal.items&&state.meal.items.length&&confirm("Tømme hele dagens måltider?")){state.meal={date:todayISO(),items:[]};save();renderDay();}};
+  $("mealList").addEventListener("click",ev=>{const i=ev.target.dataset.mdel;if(i!=null){state.meal.items.splice(+i,1);save();renderDay();}});
+  $("cfAddBtn").onclick=()=>{
+    const name=$("cfName").value.trim();const g=parseFloat(($("cfGram").value||"").replace(",","."));
+    if(!name||!g||g<=0){toast("Skriv navn og gram per porsjon");return;}
+    state.customFoods.push({name,g:Math.round(g*10)/10});save();$("cfName").value="";$("cfGram").value="";
+    populateFoodSelect();toast("Matvare lagt til");
+  };
 });
 
 let deferredPrompt=null;
