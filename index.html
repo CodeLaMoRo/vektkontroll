@@ -254,10 +254,12 @@ details:not([open]) .lbl-close{display:none}
     <div class="btn-row"><button class="btn" id="addBtn">Lagre registrering</button></div>
   </section>
 
-  <section class="card" id="listCard">
-    <div class="pad" style="padding-bottom:6px"><div class="label">Registreringer</div></div>
-    <div id="list"></div>
-  </section>
+  <details class="tools">
+    <summary>Registreringer <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary>
+    <div class="tools-body" style="padding:0">
+      <div id="list"></div>
+    </div>
+  </details>
 
   <details class="tools">
     <summary>Innstillinger og sikkerhetskopi <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary>
