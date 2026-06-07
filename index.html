@@ -159,6 +159,19 @@ details:not([open]) .lbl-close{display:none}
 .kref{display:grid;grid-template-columns:1fr auto}
 .kref div{padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
 .kref .kv{font-family:"JetBrains Mono",monospace;text-align:right;color:var(--ink-soft)}
+/* metode */
+.mtitle{font-family:"Fraunces",serif;font-weight:600;font-size:21px;line-height:1.1;margin-bottom:8px}
+.msub{font-family:"Fraunces",serif;font-weight:500;font-size:16px;margin-bottom:8px}
+#viewMetode p{font-size:14px;line-height:1.6;margin-bottom:10px}
+#viewMetode p:last-child{margin-bottom:0}
+#viewMetode .muted{color:var(--ink-soft);font-size:12px}
+.illu{width:100%;background:var(--paper-2);border:1px solid var(--line);border-radius:13px;padding:12px;margin:8px 0 6px}
+.illu-cap{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:2px}
+.steps{margin:8px 0 6px;padding:0;list-style:none}
+.steps li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;margin-bottom:9px}
+.steps li .n{flex:none;width:23px;height:23px;border-radius:50%;background:var(--green);color:var(--paper);display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+.faq summary{font-size:14px;font-weight:600}
+.faq .tools-body p{font-size:14px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -179,6 +192,7 @@ details:not([open]) .lbl-close{display:none}
   <nav class="tabs">
     <button class="tab on" id="tabVekt">⚖️ Vekt</button>
     <button class="tab" id="tabMat">🍽️ Mat</button>
+    <button class="tab" id="tabMetode">📖 Metode</button>
   </nav>
 
   <div id="viewVekt">
@@ -192,6 +206,7 @@ details:not([open]) .lbl-close{display:none}
     </div>
     <div class="plan-status" id="planStatus"></div>
     <div class="meals" id="meals"></div>
+    <div id="planEaten"></div>
     <div class="row" id="evRow" style="margin-top:14px;display:none">
       <div class="field"><label for="evWeight">Vekt før siste måltid (kg) – justerer kvelds</label><input type="number" id="evWeight" inputmode="decimal" step="0.1" placeholder="valgfritt"></div>
     </div>
@@ -309,6 +324,112 @@ details:not([open]) .lbl-close{display:none}
         <div id="kcalRef"></div>
       </div>
     </details>
+  </div>
+
+  <div id="viewMetode" hidden>
+    <section class="card pad">
+      <div class="mtitle">Metoden: closed-loop vektstyring</div>
+      <p>I stedet for å telle kalorier styrer du vekten <b>direkte</b> mot en synkende mållinje – som en termostat. Hver dag justeres hvor mye du kan spise ut fra hva vekta faktisk viser mot målet. Derfor «lukket sløyfe»: systemet korrigerer seg selv.</p>
+    </section>
+
+    <section class="card pad">
+      <div class="msub">Slik fungerer det</div>
+      <ul class="steps">
+        <li><span class="n">1</span><span><b>Startvekt</b> veies om kvelden etter siste måltid. Sammen med <b>målvekt</b> og en <b>periode</b> (antall dager) gir det en mållinje som synker en fast andel hver dag (total reduksjon ÷ antall dager).</span></li>
+        <li><span class="n">2</span><span>Hver <b>morgen</b> veier du deg. Siden du faster om natten, er morgenvekten lavere enn kveldens mål.</span></li>
+        <li><span class="n">3</span><span><b>Mat i dag = dagens mållinje − morgenvekt.</b> Det er hvor mye (i vekt) du kan spise og likevel treffe målet til kvelden.</span></li>
+        <li><span class="n">4</span><span>Mengden fordeles på måltidene etter prosentene dine (frokost/lunsj/middag/kvelds).</span></li>
+        <li><span class="n">5</span><span>Spiser du <b>magert/sunt</b>, går du mer ned om natten → større margin neste dag. Spiser du <b>fett/energirikt</b>, blir marginen mindre. Slik belønner metoden sunn mat.</span></li>
+      </ul>
+      <div class="illu">
+        <svg viewBox="0 0 320 168" role="img" aria-label="Mållinje med morgenvekt og mat">
+          <line x1="24" y1="146" x2="300" y2="146" stroke="var(--line)"/>
+          <path d="M24 30 L300 120" fill="none" stroke="var(--green-soft)" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="300" y="24" text-anchor="end" font-size="10" fill="var(--green-soft)" font-family="JetBrains Mono,monospace">mållinje ↓</text>
+          <!-- dag 1 -->
+          <line x1="72" y1="68" x2="72" y2="50" stroke="var(--gold)" stroke-width="2"/><path d="M68 52 L72 45 L76 52 Z" fill="var(--gold)"/>
+          <circle cx="72" cy="68" r="3" fill="var(--ink-soft)"/><circle cx="72" cy="44" r="3.4" fill="var(--green)"/>
+          <!-- dag 2 -->
+          <line x1="136" y1="88" x2="136" y2="71" stroke="var(--gold)" stroke-width="2"/><path d="M132 73 L136 66 L140 73 Z" fill="var(--gold)"/>
+          <circle cx="136" cy="88" r="3" fill="var(--ink-soft)"/><circle cx="136" cy="65" r="3.4" fill="var(--green)"/>
+          <!-- dag 3 -->
+          <line x1="200" y1="108" x2="200" y2="91" stroke="var(--gold)" stroke-width="2"/><path d="M196 93 L200 86 L204 93 Z" fill="var(--gold)"/>
+          <circle cx="200" cy="108" r="3" fill="var(--ink-soft)"/><circle cx="200" cy="86" r="3.4" fill="var(--green)"/>
+          <!-- dag 4 -->
+          <line x1="264" y1="128" x2="264" y2="111" stroke="var(--gold)" stroke-width="2"/><path d="M260 113 L264 106 L268 113 Z" fill="var(--gold)"/>
+          <circle cx="264" cy="128" r="3" fill="var(--ink-soft)"/><circle cx="264" cy="107" r="3.4" fill="var(--green)"/>
+          <text x="72" y="162" text-anchor="middle" font-size="9" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">Dag 1</text>
+          <text x="136" y="162" text-anchor="middle" font-size="9" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">Dag 2</text>
+          <text x="200" y="162" text-anchor="middle" font-size="9" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">Dag 3</text>
+          <text x="264" y="162" text-anchor="middle" font-size="9" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">Dag 4</text>
+        </svg>
+        <div class="illu-cap">🟢 kveldsmål (på mållinja) · ⚫ morgenvekt · ↑ gult = maten du kan spise den dagen</div>
+      </div>
+    </section>
+
+    <section class="card pad">
+      <div class="msub">Et regneeksempel</div>
+      <p>Startvekt 114,2 kg (kveld) → mål 100 kg på 90 dager gir <b>158 g/dag</b> i reduksjon. Dag 1 blir mållinja 114,2 − 0,158 = <b>114,04 kg</b>. Veier du <b>113,6 kg</b> om morgenen, kan du spise 114,04 − 113,6 = <b>0,44 kg = 440 g</b> den dagen.</p>
+      <p class="muted">Originaleksempel fra metoden: 80 → 76 kg på 40 dager = 100 g/dag. Morgenvekt 78,8 mot kveldsmål 79,9 → 1,1 kg mat den dagen.</p>
+    </section>
+
+    <section class="card pad">
+      <div class="msub">Presisjon vs. nøyaktighet</div>
+      <p>Vekta trenger ikke vise helt <i>riktig</i> tall (nøyaktighet) – den må bare være <b>jevn fra gang til gang</b> (presisjon). De fleste badevekter (±100 g) holder; målefeil jevner seg ut på et par dager.</p>
+      <div class="illu">
+        <svg viewBox="0 0 320 150" role="img" aria-label="Presisjon vs nøyaktighet">
+          <g>
+            <circle cx="80" cy="62" r="42" fill="none" stroke="var(--line)"/><circle cx="80" cy="62" r="27" fill="none" stroke="var(--line)"/><circle cx="80" cy="62" r="12" fill="none" stroke="var(--line)"/><circle cx="80" cy="62" r="2.5" fill="var(--ink-soft)"/>
+            <circle cx="96" cy="48" r="3.2" fill="var(--green)"/><circle cx="99" cy="52" r="3.2" fill="var(--green)"/><circle cx="93" cy="51" r="3.2" fill="var(--green)"/><circle cx="97" cy="45" r="3.2" fill="var(--green)"/><circle cx="92" cy="46" r="3.2" fill="var(--green)"/>
+            <text x="80" y="124" text-anchor="middle" font-size="12" fill="var(--green-soft)" font-weight="700" font-family="Fraunces,serif">Presis</text>
+            <text x="80" y="140" text-anchor="middle" font-size="10" fill="var(--ink-soft)">jevnt → bra</text>
+          </g>
+          <g>
+            <circle cx="240" cy="62" r="42" fill="none" stroke="var(--line)"/><circle cx="240" cy="62" r="27" fill="none" stroke="var(--line)"/><circle cx="240" cy="62" r="12" fill="none" stroke="var(--line)"/><circle cx="240" cy="62" r="2.5" fill="var(--ink-soft)"/>
+            <circle cx="218" cy="44" r="3.2" fill="var(--clay)"/><circle cx="262" cy="55" r="3.2" fill="var(--clay)"/><circle cx="244" cy="86" r="3.2" fill="var(--clay)"/><circle cx="226" cy="74" r="3.2" fill="var(--clay)"/><circle cx="256" cy="38" r="3.2" fill="var(--clay)"/>
+            <text x="240" y="124" text-anchor="middle" font-size="12" fill="var(--clay)" font-weight="700" font-family="Fraunces,serif">Upresis</text>
+            <text x="240" y="140" text-anchor="middle" font-size="10" fill="var(--ink-soft)">spriker → ujevn matmengde</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section style="margin-top:18px">
+      <div class="msub" style="margin:0 4px 10px">Vanlige spørsmål</div>
+
+      <details class="tools faq"><summary>Hva med væske og drikke? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>I prinsippet skal all væske veies inn, og det gjorde jeg i pilotforsøket. I praksis er det likevel ikke avgjørende, fordi du raskt skiller ut omtrent like mye væske som du drikker – faktisk litt mer når du går ned i vekt. Kort sagt: du trenger ikke regne med væske i måltidsvektene, så lenge du treffer dagens mål nøyaktig hver dag.</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Hva med cola? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Væskeinntak er i prinsippet det samme for vann og cola. Drikker du 2 liter cola om dagen, skiller du også ut ca. 2 liter vann, så det balanserer. En halvliter cola har ca. 39 g sukker, som i prinsippet bør regnes med, men vektmessig er det marginalt. Men drikker du 2 liter cola i dag, blir vekttapet i natt betydelig lavere enn ellers – så i morgen kan du spise mye mindre enn om du hadde drukket vann.</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Spiller det en rolle om maten er fet eller mager? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Det er alltid anbefalt å spise sunt – også med denne metoden. Spiser du energirik mat, henter kroppen mindre fra reservene og mer i direkte omsetning enn ved mager mat. Da veier du mer neste morgen, får en mindre margin til dagens mål, og kan spise betydelig mindre. I prinsippet kan du spise hva du vil, men spiser du usunt, får du på sikt ikke spise mye – det er faktisk motiverende for å spise sunt. For vitenskapens skyld testet jeg begge deler: dagene etter en kveld med mye rødt kjøtt + vin + snacks var ganske tunge å komme seg gjennom …</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Hvor nøyaktig må vekta være? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Ikke spesielt nøyaktig. De fleste badevekter har ±100 g oppløsning, og det fungerer fint. På en enkelt dag gir det litt variasjon i hvor mye du kan spise, men det jevner seg ut på noen dager. Jeg valgte 239 g vekttap per dag – det kan ikke treffes presist på én dag, men jeg traff 2,4 kg på ti dager. Det samme gjelder kjøkkenvekta: målefeil jevner seg ut på et par dager.</p>
+        <p>For nerdene: i teknisk vitenskap skiller vi mellom nøyaktighet og presisjon. Her er <b>presisjon</b> det viktige – det betyr lite at vekta viser «feil» tall, så lenge den ikke spriker fra gang til gang (se figuren over).</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Kan man gå opp i vekt med metoden? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Ja. Bytter du det daglige vekttapet med en ønsket vektøkning, bør metoden fungere på nøyaktig samme måte. (Det finnes foreløpig ikke empirisk grunnlag for dette – tilbakemeldinger fra brukere som har prøvd, mottas gjerne.)</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Kan jeg ta en pause? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Selvsagt. Sett det daglige vekttapet til null så lenge du vil – det tillatte inntaket øker da umiddelbart med det du pleide å gå ned. I løpet av få dager øker kroppen forbrenningen (siden reservene ikke lenger tømmes), så inntaket øker gjerne ytterligere av seg selv.</p>
+        <p><b>Følg med på vekten i pausen.</b> Etter en periode med nedgang er forbrenningen sannsynligvis på et minimum – det stimulerer til overspising, og kroppen legger på seg raskere enn normalt.</p>
+      </div></details>
+
+      <details class="tools faq"><summary>Jeg vil slutte – hva da? <span class="label lbl-open">åpne</span><span class="label lbl-close">lukk</span></summary><div class="tools-body">
+        <p>Slutter du, vær oppmerksom på faren for rekyl. Har du fulgt metoden en stund, er forbrenningen trolig lav, hjernen stimuleres til å overspise, og kroppen er disponert for rask vektøkning.</p>
+        <p>Følg med på vekten etterpå. Det beste er å fortsette litt til med <b>null vekttap</b>, eller til og med en liten bevisst vektøkning (for større måltider), mens forbrenningen normaliseres.</p>
+      </div></details>
+
+      <p class="muted" style="text-align:center;margin-top:14px">Metode og FAQ basert på opphavspersonens beskrivelse. Matvektdata: Frukt.no / Lise von Krogh.</p>
+    </section>
   </div>
 
   <footer>
@@ -453,7 +574,7 @@ function renderPlan(){
 
   if(!ref){
     $("planStatus").innerHTML="Logg morgenvekten din for å se hvor mye du kan spise i dag.";
-    $("meals").innerHTML="";$("planGrid").innerHTML="";$("evRow").style.display="none";return;
+    $("meals").innerHTML="";$("planGrid").innerHTML="";$("planEaten").innerHTML="";$("evRow").style.display="none";return;
   }
   const isToday=!!todayEntry;
   const morning=ref.w;
@@ -470,6 +591,16 @@ function renderPlan(){
     else g=Math.round(totalG*(shares[m[0]]||0)/100);
     return '<div class="meal"><div class="mi">'+m[1]+'</div><div class="mn">'+m[2]+tag+'</div><div class="mv">'+g+'<span class="u"> g</span></div></div>';
   }).join("");
+
+  // Spist i dag vs. budsjett – vises også her på Vekt-fanen
+  const eaten=(state.meal&&state.meal.date===today)?Math.round(state.meal.items.reduce((s,it)=>s+it.g*it.qty,0)):0;
+  let pe='<div class="daytot" style="margin-top:14px"><span class="label">Spist i dag</span><span class="dv" style="font-size:22px">'+eaten+' g</span></div>';
+  if(totalG>0){
+    const epct=Math.min(1,eaten/totalG),eover=eaten>totalG;
+    pe+='<div class="budget-bar"><div class="budget-fill'+(eover?' over':'')+'" style="width:'+(epct*100).toFixed(0)+'%"></div></div>';
+    pe+='<div class="hint" style="margin-top:0">'+(eover?'<b style="color:var(--clay)">'+(eaten-totalG)+' g over</b> budsjettet ('+totalG+' g)':'<b>'+(totalG-eaten)+' g igjen</b> av '+totalG+' g budsjett')+'</div>';
+  }else pe+='<div class="hint" style="margin-top:0">Loggfør mat i Mat-fanen for å følge dagstotalen.</div>';
+  $("planEaten").innerHTML=pe;
 
   // kveldsvekt-felt (kun når dagens morgenvekt er logget)
   $("evRow").style.display=isToday?"flex":"none";
@@ -788,14 +919,16 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   // faner
-  function showTab(mat){
-    $("viewMat").hidden=!mat;$("viewVekt").hidden=mat;
-    $("tabMat").classList.toggle("on",mat);$("tabVekt").classList.toggle("on",!mat);
+  function showTab(name){
+    const views={vekt:"viewVekt",mat:"viewMat",metode:"viewMetode"},tabs={vekt:"tabVekt",mat:"tabMat",metode:"tabMetode"};
+    Object.keys(views).forEach(n=>{$(views[n]).hidden=(n!==name);$(tabs[n]).classList.toggle("on",n===name);});
     window.scrollTo({top:0,behavior:"smooth"});
-    if(mat){populateFoodSelect();renderDay();}
+    if(name==="mat"){populateFoodSelect();renderDay();}
+    else if(name==="vekt")render();
   }
-  $("tabVekt").onclick=()=>showTab(false);
-  $("tabMat").onclick=()=>showTab(true);
+  $("tabVekt").onclick=()=>showTab("vekt");
+  $("tabMat").onclick=()=>showTab("mat");
+  $("tabMetode").onclick=()=>showTab("metode");
   // matvekt
   $("mealPick").addEventListener("click",ev=>{
     const b=ev.target.closest("button[data-meal]");if(!b)return;
