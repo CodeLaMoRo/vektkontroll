@@ -310,11 +310,12 @@ function editEntry(date){
 /* ---- planmatematikk (closed-loop) ---- */
 function addDays(iso,n){const t=new Date(iso+"T00:00:00");t.setDate(t.getDate()+n);return t.toISOString().slice(0,10);}
 function daysBetween(a,b){return Math.round((Date.parse(b+"T00:00:00")-Date.parse(a+"T00:00:00"))/864e5);}
-function tapPerDag(p){return p.periode>1?(p.startvekt-p.maalvekt)/(p.periode-1):0;}
+function tapPerDag(p){return p.periode>0?(p.startvekt-p.maalvekt)/p.periode:0;}
 function planEnd(p){return addDays(p.startdato,p.periode-1);}
 function maallinje(p,iso){
+  // dag 1 = startdato = første reduksjonsdag (dagens andel av reduksjonen er medregnet)
   const dag=Math.max(1,Math.min(p.periode,daysBetween(p.startdato,iso)+1));
-  return p.startvekt-tapPerDag(p)*(dag-1);
+  return p.startvekt-tapPerDag(p)*dag;
 }
 function rations(p,weight,iso){
   const ml=maallinje(p,iso);
@@ -452,7 +453,7 @@ function renderChart(){
   const goalLine='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--clay)" stroke-width="1.2" stroke-dasharray="2 4" opacity="0.6"/>'+
     '<text x="'+(W-padR)+'" y="'+(+gy-5)+'" text-anchor="end" font-size="10" fill="var(--clay)" font-family="JetBrains Mono,monospace">målvekt '+fmt(p.maalvekt)+'</text>';
   // mållinje (daglig målvekt) over planperioden
-  const ax=X(p.startdato),ay=Y(p.startvekt),bx=X(end),by=Y(p.maalvekt);
+  const ax=X(p.startdato),ay=Y(maallinje(p,p.startdato)),bx=X(end),by=Y(p.maalvekt);
   const tgtLine='<path d="M '+ax.toFixed(1)+' '+ay.toFixed(1)+' L '+bx.toFixed(1)+' '+by.toFixed(1)+'" fill="none" stroke="var(--green-soft)" stroke-width="2" stroke-dasharray="5 4"/>'+
     '<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="2.5" fill="var(--green-soft)"/>'+
     '<text x="'+bx.toFixed(1)+'" y="'+(by-6).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--green-soft)" font-family="JetBrains Mono,monospace">mållinje</text>';
