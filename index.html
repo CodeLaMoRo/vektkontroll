@@ -171,6 +171,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
         <button class="chip" id="rng90">90 d</button>
         <button class="chip" id="rng30">30 d</button>
         <button class="chip" id="rng7">7 d</button>
+        <input type="date" id="chartFrom" class="chip" style="padding:4px 8px;color:var(--ink-soft)" title="Vis graf fra valgt dato">
       </div>
     </div>
     <div id="chart"></div>
@@ -196,7 +197,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
     <div class="tools-body">
       <div class="subhead">Plan og målvekt</div>
       <div class="row">
-        <div class="field"><label for="pStart">Startvekt (kg)</label><input type="number" id="pStart" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="pStart">Startvekt – kveldsvekt etter siste måltid (kg)</label><input type="number" id="pStart" inputmode="decimal" step="0.1"></div>
         <div class="field"><label for="pMaal">Målvekt (kg)</label><input type="number" id="pMaal" inputmode="decimal" step="0.1"></div>
       </div>
       <div class="row" style="margin-top:10px">
@@ -211,7 +212,7 @@ footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:26px;li
       </div>
       <div class="field" style="margin-top:10px;max-width:200px"><label for="height">Høyde (cm, for BMI)</label><input type="number" id="height" inputmode="numeric" step="1" placeholder="valgfritt"></div>
       <div class="btn-row"><button class="btn ghost" id="saveSettings">Lagre plan og innstillinger</button></div>
-      <p class="hint">Metoden: total mat i dag = dagens mållinje − morgenvekt, fordelt på måltidene etter prosentene (vist i gram). Siste måltid (kvelds) justeres av vekten du måler rett før det. Summen av prosentene bør være 100.</p>
+      <p class="hint">Metoden: <b>startvekt er kveldsvekten din</b> (etter siste måltid), høyere enn morgenvekten. Total mat i dag = dagens mållinje − morgenvekt, fordelt på måltidene etter prosentene (i gram). Siste måltid (kvelds) justeres av vekten du måler rett før det. Summen av prosentene bør være 100.</p>
 
       <div class="subhead">Dine data</div>
       <p class="hint">Denne appen inneholder ingen persondata. Første gang importerer du dine egne veiinger fra backup-fila under «Sikkerhetskopi» nedenfor. Alt lagres kun lokalt på enheten din.</p>
@@ -254,6 +255,7 @@ function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),pe
 
 let state={entries:[],goal:null,height:null,plan:defaultPlan()};
 let chartRange="all"; // all | 1y | 90 | 30 | 7
+let chartFrom="";      // egendefinert startdato for grafen (ISO) – overstyrer chartRange
 
 /* ---- lagring ---- */
 function load(){
@@ -418,6 +420,7 @@ function renderPlan(){
 /* ---- graf ---- */
 function visibleEntries(){
   const e=state.entries;if(!e.length)return e;
+  if(chartFrom)return e.filter(o=>o.date>=chartFrom);
   if(chartRange==="all")return e;
   const days={"1y":365,"90":90,"30":30,"7":7}[chartRange]||365;
   const cut=addDays(e[e.length-1].date,-days);
@@ -430,7 +433,7 @@ function renderChart(){
   const t=iso=>Date.parse(iso+"T00:00:00");
   const W=640,H=240,padL=40,padR=14,padT=14,padB=28;
   // x-domene: dekk synlige registreringer + hele planperioden (så mållinja vises)
-  let tMin=Math.min(t(e[0].date),t(p.startdato));
+  let tMin=chartFrom?t(chartFrom):Math.min(t(e[0].date),t(p.startdato));
   let tMax=Math.max(t(e[e.length-1].date),t(end));
   if(tMax<=tMin)tMax=tMin+86400000;
   // y-domene: vekter + start/målvekt
@@ -549,8 +552,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
   const ranges={rngAll:"all",rng1y:"1y",rng90:"90",rng30:"30",rng7:"7"};
   Object.keys(ranges).forEach(id=>$(id).onclick=()=>{
-    chartRange=ranges[id];
+    chartRange=ranges[id];chartFrom="";$("chartFrom").value="";
     Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",x===id));
+    renderChart();
+  });
+  $("chartFrom").addEventListener("change",()=>{
+    chartFrom=$("chartFrom").value||"";
+    Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",!chartFrom&&ranges[x]===chartRange));
     renderChart();
   });
 });
