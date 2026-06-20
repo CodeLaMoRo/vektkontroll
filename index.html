@@ -97,8 +97,14 @@ input:focus{outline:2px solid var(--green-soft);outline-offset:1px;border-color:
 .btn.clay{background:var(--clay)}
 .btn-row{display:flex;gap:10px;margin-top:14px}
 /* list */
+.entry-row{border-bottom:1px solid var(--line)}
+.entry-row:last-child{border-bottom:none}
 .entry{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}
 .entry:last-child{border-bottom:none}
+.wmline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:0 16px 11px;margin-top:-2px}
+.wmline .wmtag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-weight:600}
+.wmline .wmv{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-soft)}
+.wmline .wmv b{color:var(--ink);font-weight:700}
 .entry .date{font-size:13px;color:var(--ink-soft);width:96px;flex:none}
 .entry .w{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:17px}
 .entry .d{font-family:"JetBrains Mono",monospace;font-size:12px;margin-left:6px}
@@ -223,7 +229,8 @@ details:not([open]) .lbl-close{display:none}
     <div class="chart-head">
       <h2>Utvikling</h2>
       <div class="chart-toggle">
-        <button class="chip on" id="rngAll">Alt</button>
+        <button class="chip on" id="rngSession">Denne økten</button>
+        <button class="chip" id="rngAll">Alt</button>
         <button class="chip" id="rng1y">1 år</button>
         <button class="chip" id="rng90">90 d</button>
         <button class="chip" id="rng30">30 d</button>
@@ -478,7 +485,7 @@ const SEED=SEED_RAW.map(p=>({date:p[0],w:p[1],note:""}));
 function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),periode:90,frokost:30,lunsj:10,middag:50,kvelds:10,pause:false};}
 
 let state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};
-let chartRange="all"; // all | 1y | 90 | 30 | 7
+let chartRange="session"; // session | all | 1y | 90 | 30 | 7
 let chartFrom="";      // egendefinert startdato for grafen (ISO) – overstyrer chartRange
 
 /* ---- lagring ---- */
@@ -548,6 +555,13 @@ function editEntry(date){
   $("d").value=e.date;loadEntryForm(e.date);
   window.scrollTo({top:0,behavior:"smooth"});
   toast("Endre verdiene og lagre på nytt");
+}
+// Sett datofeltet til i dag når appen åpnes/får fokus på nytt (f.eks. neste morgen
+// uten at den installerte appen lastes på nytt). Endrer ikke en dato du selv har valgt
+// for å redigere en tidligere dag, så lenge du holder appen i forgrunnen.
+function refreshDateToToday(){
+  const t=todayISO();
+  if($("d")&&$("d").value!==t){$("d").value=t;loadEntryForm(t);}
 }
 
 /* ---- planmatematikk (closed-loop) ---- */
@@ -673,6 +687,7 @@ function renderPlan(){
 function visibleEntries(){
   const e=state.entries;if(!e.length)return e;
   if(chartFrom)return e.filter(o=>o.date>=chartFrom);
+  if(chartRange==="session")return e.filter(o=>o.date>=state.plan.startdato);
   if(chartRange==="all")return e;
   const days={"1y":365,"90":90,"30":30,"7":7}[chartRange]||365;
   const cut=addDays(e[e.length-1].date,-days);
@@ -733,9 +748,14 @@ function renderList(){
     const prev=all[idx+1];let d="";
     if(prev){const diff=o.w-prev.w;const c=diff<0?"down":diff>0?"up":"";d='<span class="d '+c+'">'+(diff>0?"+":"")+fmt(diff)+'</span>';}
     const note=o.note?" · "+o.note.replace(/</g,"&lt;"):"";
-    return '<div class="entry"><span class="date">'+fmtDate(o.date)+note+'</span><span class="w">'+fmt(o.w)+'<span class="u" style="font-size:12px;color:var(--ink-soft)"> kg</span></span>'+d+'<span class="sp"></span>'+
+    let wmLine="";
+    if(o.wm){
+      const parts=MEALS.filter(m=>o.wm[m[0]]!=null).map(m=>'<span class="wmv">'+m[1]+' <b>'+fmt(o.wm[m[0]])+'</b></span>');
+      if(parts.length)wmLine='<div class="wmline"><span class="wmtag">etter måltid</span>'+parts.join("")+'</div>';
+    }
+    return '<div class="entry-row"><div class="entry"><span class="date">'+fmtDate(o.date)+note+'</span><span class="w">'+fmt(o.w)+'<span class="u" style="font-size:12px;color:var(--ink-soft)"> kg</span></span>'+d+'<span class="sp"></span>'+
       '<button class="iconbtn" title="Endre" data-edit="'+o.date+'">✎</button>'+
-      '<button class="iconbtn" title="Slett" data-del="'+o.date+'">🗑</button></div>';
+      '<button class="iconbtn" title="Slett" data-del="'+o.date+'">🗑</button></div>'+wmLine+'</div>';
   }).join("");
   if(all.length>listLimit)html+='<div class="listcap"><button id="moreBtn">Vis flere ('+(all.length-listLimit)+' igjen)</button></div>';
   host.innerHTML=html;
@@ -946,6 +966,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("addBtn").onclick=addEntry;
   $("w").addEventListener("keydown",ev=>{if(ev.key==="Enter")addEntry();});
   $("d").addEventListener("change",()=>loadEntryForm($("d").value));
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshDateToToday();});
+  window.addEventListener("pageshow",refreshDateToToday);
+  window.addEventListener("focus",refreshDateToToday);
   $("saveSettings").onclick=()=>{
     const num=(id,def)=>{const v=parseFloat(($(id).value||"").replace(",","."));return isNaN(v)?def:v;};
     const p=state.plan;
@@ -966,7 +989,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const ed=ev.target.dataset.edit,dl=ev.target.dataset.del;
     if(ed)editEntry(ed);if(dl)delEntry(dl);
   });
-  const ranges={rngAll:"all",rng1y:"1y",rng90:"90",rng30:"30",rng7:"7"};
+  const ranges={rngSession:"session",rngAll:"all",rng1y:"1y",rng90:"90",rng30:"30",rng7:"7"};
   Object.keys(ranges).forEach(id=>$(id).onclick=()=>{
     chartRange=ranges[id];chartFrom="";$("chartFrom").value="";
     Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",x===id));
