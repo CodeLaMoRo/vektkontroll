@@ -77,6 +77,9 @@ section{margin-top:18px}
 .chart-toggle{display:flex;gap:6px;flex-wrap:wrap}
 .chip{font-size:11px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer}
 .chip.on{background:var(--green);color:var(--paper);border-color:var(--green)}
+.fwdctl{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;padding:5px 8px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft)}
+.fwdctl input[type=number]{width:36px;padding:0;border:none;background:transparent;color:var(--ink);font-size:12px;font-weight:600;text-align:center;font-family:"JetBrains Mono",monospace}
+.fwdctl input[type=number]:focus{outline:none}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .empty{padding:34px 16px;text-align:center;color:var(--ink-soft);font-size:14px}
 /* form */
@@ -236,6 +239,7 @@ details:not([open]) .lbl-close{display:none}
         <button class="chip" id="rng30">30 d</button>
         <button class="chip" id="rng7">7 d</button>
         <input type="date" id="chartFrom" class="chip" style="padding:4px 8px;color:var(--ink-soft)" title="Vis graf fra valgt dato">
+        <label class="fwdctl" title="Hvor mange dager fram i tid grafen viser (i tillegg til periodevalget)">+<input type="number" id="chartFwd" min="0" max="365" step="1" value="7">d</label>
       </div>
     </div>
     <div id="chart"></div>
@@ -487,6 +491,7 @@ function defaultPlan(){return{startvekt:115,maalvekt:100,startdato:todayISO(),pe
 let state={entries:[],goal:null,height:null,plan:defaultPlan(),meal:{date:"",items:[]},customFoods:[]};
 let chartRange="session"; // session | all | 1y | 90 | 30 | 7
 let chartFrom="";      // egendefinert startdato for grafen (ISO) – overstyrer chartRange
+let chartFwd=7;        // hvor mange dager fram i tid grafen viser (høyrekant)
 
 /* ---- lagring ---- */
 function load(){
@@ -693,21 +698,40 @@ function visibleEntries(){
   const cut=addDays(e[e.length-1].date,-days);
   return e.filter(o=>o.date>=cut);
 }
+// lineær regresjon (minste kvadraters metode) på registreringene i gjeldende økt
+function sessionTrend(){
+  const p=state.plan;
+  const pts=state.entries.filter(o=>o.date>=p.startdato);
+  if(pts.length<2)return null;
+  let n=pts.length,sx=0,sy=0,sxy=0,sxx=0;
+  pts.forEach(o=>{const x=daysBetween(p.startdato,o.date),y=o.w;sx+=x;sy+=y;sxy+=x*y;sxx+=x*x;});
+  const den=n*sxx-sx*sx;if(den===0)return null;
+  const b=(n*sxy-sx*sy)/den,a=(sy-b*sx)/n;   // y = a + b·(dager fra startdato)
+  return{a,b,startISO:pts[0].date};
+}
 function renderChart(){
   const host=$("chart");const e=visibleEntries();const p=state.plan;
   if(!e.length){host.innerHTML='<div class="empty">Grafen vises når du har registreringer i valgt periode.</div>';return;}
   const end=planEnd(p);
   const t=iso=>Date.parse(iso+"T00:00:00");
+  const fmtTs=ts=>{const dt=new Date(ts);const dd=String(dt.getDate()).padStart(2,"0"),mm=String(dt.getMonth()+1).padStart(2,"0");return dd+"."+mm+"."+String(dt.getFullYear()).slice(2);};
   const W=640,H=240,padL=40,padR=14,padT=14,padB=28;
-  // x-domene: dekk synlige registreringer + hele planperioden (så mållinja vises)
+  // x-domene: venstrekant fra periodevalget, høyrekant begrenset til «x dager fram i tid»
   let tMin=chartFrom?t(chartFrom):Math.min(t(e[0].date),t(p.startdato));
-  let tMax=Math.max(t(e[e.length-1].date),t(end));
+  const fwd=Math.max(0,Math.round(chartFwd)||0);
+  const tFwd=t(todayISO())+fwd*86400000;                 // så mange dager fram i tid som valgt
+  let tMax=Math.max(t(e[e.length-1].date),Math.min(t(end),tFwd));
   if(tMax<=tMin)tMax=tMin+86400000;
-  // y-domene: vekter + start/målvekt
+  const Xts=ts=>padL+(W-padL-padR)*((ts-tMin)/(tMax-tMin));
+  const X=iso=>Xts(t(iso));
+  // trendlinje for gjeldende økt
+  const tr=sessionTrend();
+  const trendY=ts=>tr.a+tr.b*((ts-t(p.startdato))/86400000);
+  // y-domene: vekter + start/målvekt (+ trendens endepunkter i synlig vindu)
   const ys=e.map(o=>o.w).concat([p.startvekt,p.maalvekt]);
+  if(tr){ys.push(trendY(Math.max(tMin,t(p.startdato))),trendY(tMax));}
   let lo=Math.min(...ys),hi=Math.max(...ys);
   const span=Math.max(hi-lo,1);lo-=span*0.12;hi+=span*0.12;
-  const X=iso=>padL+(W-padL-padR)*((t(iso)-tMin)/(tMax-tMin));
   const Y=v=>padT+(H-padT-padB)*(1-(v-lo)/(hi-lo));
   let grid="",ticks=4;
   for(let i=0;i<=ticks;i++){const v=lo+(hi-lo)*i/ticks;const y=Y(v).toFixed(1);
@@ -718,22 +742,38 @@ function renderChart(){
   const gy=Y(p.maalvekt).toFixed(1);
   const goalLine='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="var(--clay)" stroke-width="1.2" stroke-dasharray="2 4" opacity="0.6"/>'+
     '<text x="'+(W-padR)+'" y="'+(+gy-5)+'" text-anchor="end" font-size="10" fill="var(--clay)" font-family="JetBrains Mono,monospace">målvekt '+fmt(p.maalvekt)+'</text>';
-  // mållinje (daglig målvekt) over planperioden
-  const ax=X(p.startdato),ay=Y(maallinje(p,p.startdato)),bx=X(end),by=Y(maallinje(p,end));
-  const tgtLine='<path d="M '+ax.toFixed(1)+' '+ay.toFixed(1)+' L '+bx.toFixed(1)+' '+by.toFixed(1)+'" fill="none" stroke="var(--green-soft)" stroke-width="2" stroke-dasharray="5 4"/>'+
-    '<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="2.5" fill="var(--green-soft)"/>'+
-    '<text x="'+bx.toFixed(1)+'" y="'+(by-6).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--green-soft)" font-family="JetBrains Mono,monospace">mållinje</text>';
+  // mållinje (daglig målvekt) – klippet til synlig x-vindu
+  const mY1=maallinje(p,p.startdato),mY2=maallinje(p,end);
+  const mlLerp=ts=>{const sp=t(end)-t(p.startdato)||1;return mY1+(mY2-mY1)*((ts-t(p.startdato))/sp);};
+  const mlL=Math.max(t(p.startdato),tMin),mlR=Math.min(t(end),tMax);
+  let tgtLine="";
+  if(mlR>mlL){
+    const ax=Xts(mlL),ay=Y(mlLerp(mlL)),bx=Xts(mlR),by=Y(mlLerp(mlR));
+    tgtLine='<path d="M '+ax.toFixed(1)+' '+ay.toFixed(1)+' L '+bx.toFixed(1)+' '+by.toFixed(1)+'" fill="none" stroke="var(--green-soft)" stroke-width="2" stroke-dasharray="5 4"/>'+
+      '<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="2.5" fill="var(--green-soft)"/>'+
+      '<text x="'+bx.toFixed(1)+'" y="'+(by-6).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--green-soft)" font-family="JetBrains Mono,monospace">mållinje</text>';
+  }
+  // trendlinje – fra første øktregistrering og forlenget til høyrekant (prognose)
+  let trendLine="";
+  if(tr){
+    const trL=Math.max(t(tr.startISO),tMin),trR=tMax;
+    if(trR>trL){
+      const ax=Xts(trL),ay=Y(trendY(trL)),bx=Xts(trR),by=Y(trendY(trR));
+      trendLine='<path d="M '+ax.toFixed(1)+' '+ay.toFixed(1)+' L '+bx.toFixed(1)+' '+by.toFixed(1)+'" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="1 4" stroke-linecap="round"/>'+
+        '<text x="'+bx.toFixed(1)+'" y="'+(by+13).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--gold)" font-family="JetBrains Mono,monospace">trend</text>';
+    }
+  }
   // vektkurve
   const line=e.map((o,i)=>(i?"L":"M")+X(o.date).toFixed(1)+" "+Y(o.w).toFixed(1)).join(" ");
   const area=line+" L "+X(e[e.length-1].date).toFixed(1)+" "+(H-padB).toFixed(1)+" L "+X(e[0].date).toFixed(1)+" "+(H-padB).toFixed(1)+" Z";
   const dots=e.map((o,i)=>'<circle cx="'+X(o.date).toFixed(1)+'" cy="'+Y(o.w).toFixed(1)+'" r="'+(i===e.length-1?3.5:1.6)+'" fill="var(--green)"/>').join("");
-  const firstLbl='<text x="'+padL+'" y="'+(H-8)+'" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtDate(e[0].date)+'</text>';
-  const lastLbl='<text x="'+(W-padR)+'" y="'+(H-8)+'" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtDate(end)+'</text>';
+  const firstLbl='<text x="'+padL+'" y="'+(H-8)+'" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtTs(tMin)+'</text>';
+  const lastLbl='<text x="'+(W-padR)+'" y="'+(H-8)+'" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="JetBrains Mono,monospace">'+fmtTs(tMax)+'</text>';
   host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Vektutvikling">'+
     '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'+
     '<stop offset="0" stop-color="#33614a" stop-opacity="0.18"/><stop offset="1" stop-color="#33614a" stop-opacity="0"/>'+
     '</linearGradient></defs>'+
-    grid+'<path d="'+area+'" fill="url(#g)"/>'+goalLine+tgtLine+
+    grid+'<path d="'+area+'" fill="url(#g)"/>'+goalLine+tgtLine+trendLine+
     '<path d="'+line+'" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
     dots+firstLbl+lastLbl+'</svg>';
 }
@@ -998,6 +1038,10 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("chartFrom").addEventListener("change",()=>{
     chartFrom=$("chartFrom").value||"";
     Object.keys(ranges).forEach(x=>$(x).classList.toggle("on",!chartFrom&&ranges[x]===chartRange));
+    renderChart();
+  });
+  $("chartFwd").addEventListener("input",()=>{
+    chartFwd=Math.max(0,Math.min(365,Math.round(parseFloat($("chartFwd").value))||0));
     renderChart();
   });
 
